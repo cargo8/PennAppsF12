@@ -58,6 +58,8 @@ class Digest(models.Model):
 	timestamp = models.DateField()
 
 
+
+#These are for logging. We do not currently expect to access them
 class Email(models.Model):
     headers = TextField()
     text = TextField()
@@ -72,6 +74,7 @@ class Email(models.Model):
     spam_score = FloatField()
     spam_report = TextField()
     attachments = ManyToManyField(Attachment)
+    timestamp = models.DateField()
 
 class Attachment(models.Model)
 	link = Models.URLField()
