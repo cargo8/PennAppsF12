@@ -105,6 +105,7 @@ def parseContacts(user, input_strings):
                     contact = user.instance.contacts.create(user = contact_user)
 
 # generates a post out of the email and its recipients
+"""
 def generatePost(email, recipients):
     post = Post()
     post.author = User.objects.get(email = email.from)
@@ -136,3 +137,4 @@ def generatePost(email, recipients):
     post.likes = 0
     post.timestampt = email.timestampt
     return post
+"""
