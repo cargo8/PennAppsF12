@@ -5,3 +5,11 @@ class TryItForm(forms.Form):
     to = forms.CharField(label="Friends' emails")
     subject = forms.CharField(max_length=100)
     message = forms.CharField()
+
+
+
+class EmailForm(ModelForm)
+    attachments = IntegerField()
+    class Meta:
+        model = Email
+        exclude = 'attachments'
