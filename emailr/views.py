@@ -5,6 +5,7 @@ from django.shortcuts import render_to_response, redirect
 from django.views.generic.simple import direct_to_template
 import SmtpApiHeader
 import json
+import re
 from django.core.mail import EmailMultiAlternatives
 from emailr.models import *
 from django.views.decorators.http import require_POST
@@ -105,20 +106,18 @@ def parseContacts(user, input_strings):
                     contact = user.instance.contacts.create(user = contact_user)
 
 # generates a post out of the email and its recipients
-"""
 def generatePost(email, recipients):
     post = Post()
-    post.author = User.objects.get(email = email.from)
+    post.author = User.objects.get(email = email.sender)
     post.recipients = recipients
     post.subject = email.subject
 
     # refine the email's message
     post.text = ""
-    lines = email.text.split("\n")
+    #lines = email.text.split("\n")
+    lines = re.split(r'[\n\r]+', email.text)
     for line in lines:
-      if "r#" in line:
-        continue
-      else:
+      if not "r#" in line:
         post.text += line
 
     # extract images/links from Attachments
@@ -135,6 +134,5 @@ def generatePost(email, recipients):
       post.instance.content.add(cnt)
 
     post.likes = 0
-    post.timestampt = email.timestampt
+    post.timestamp = email.timestamp
     return post
-"""
