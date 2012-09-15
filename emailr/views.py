@@ -81,15 +81,19 @@ def renderEmail(request):
 @csrf_exempt 
 def receiveEmail(request):
     email_form = {}
+    attachments = 0
     for key in request.POST.keys():
         if 'from' == key.lower():
             email_form['sender'] = request.POST[key]
-        email_form[key] = request.POST[key]
+        elif 'attachments' == key.lower():
+            attachments = email_form['attachments'
+        else:
+            email_form[key] = request.POST[key]
    
     email = Email(email_form)
-    
     email.save()
-    for i in range(1,email.cleaned_data['attachments']+1):
+
+    for i in range(1,attachments+1):
         attachment = request.FILES['attachment%d' % i]
         #Use filepicker.io file = attachment.read()
         link = None
