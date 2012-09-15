@@ -67,8 +67,9 @@ def renderEmail(request):
         })
     return render_to_response('email.html', c)
 
-@require_POST
+#@require_POST
 def receiveEmail(request):
+    print A
     form = EmailForm(request.POST)
     if form.is_valid():
         form.instance.save()
