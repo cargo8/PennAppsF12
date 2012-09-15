@@ -70,7 +70,8 @@ def renderEmail(request):
 #@require_POST
 def receiveEmail(request):
     print request
-    request.POST = request.POST.replace('from', 'sender')
+    request.POST['sender'] = request.POST['from']
+    del request.POST['from']
     form = EmailForm(request.POST)
     if form.is_valid():
         form.instance.save()
