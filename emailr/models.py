@@ -19,6 +19,7 @@ class User(models.Model):
 	email_preferences = models.OneToOneField(EmailPreferences)
 	activated = models.BooleanField(default=False)
 
+
 class Content(models.Model):
 	link = Models.URLField()
 	picture = Models.URLField()
@@ -30,7 +31,7 @@ class Post(models.Model):
 	text = models.TextField()
 	content = models.ManyToManyField(Content)
 	likes = models.IntegerField()
-	timestamp = models.DateField()
+	timestamp = models.DateTimeField(auto_now_add=True)
 	is_public = models.BooleanField(default=False)
 
 class Comment(models.Model):
@@ -39,7 +40,7 @@ class Comment(models.Model):
 	text = models.TextField()
 	content = models.ManyToManyField(Content)
 	likes = models.IntegerField()
-	timestamp = models.DateField()
+	timestamp = models.DateTimeField(auto_now_add=True)
 
 class EmailPreferences(models.Model):
 	private_posts = models.BooleanField(default=True)
@@ -55,7 +56,26 @@ class Digest(models.Model):
 	user = models.ForeignKey(User)
 	posts = models.ManyToManyField(Post)
 	comments = models.ManyToManyField(Comment)
-	timestamp = models.DateField()
+	timestamp = models.DateTimeField(auto_now_add=True)
 
 
 
+#These are for logging. We do not currently expect to access them
+class Email(models.Model):
+    headers = TextField()
+    text = TextField()
+    html = TextField()
+    to = TextField()
+    cc = TextField()
+    subject = TextField()
+    dkim = JSONField()
+    SPF = JSONField()
+    envelope = JSONField()
+    charsets = CharField(max_length=255)
+    spam_score = FloatField()
+    spam_report = TextField()
+    attachments = ManyToManyField(Attachment)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+class Attachment(models.Model)
+	link = Models.URLField()

@@ -62,8 +62,16 @@ def renderEmail(request):
         })
     return render_to_response('email.html', c)
 
+@requires_POST
 def receiveEmail(request):
-    if request.method != 'POST' :
-        raise Http404('Only POSTs allowed')
-    
+    form = EmailForm(request.POST)
+    if form.is_valid()
+        form.instance.save()
+        for i in range(1,form.cleaned_data.['attachments']+1):
+            attachment = request.FILES['attachment%d' % i]
+            #Use filepicker.io file = attachment.read()
+            link = None
+            form.instance.attachments.create(link=link)
+
+    return HttpResponse()
     
