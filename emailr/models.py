@@ -29,7 +29,6 @@ class User(models.Model):
 	email_preferences = models.OneToOneField(EmailPreferences)
 	activated = models.BooleanField(default=False)
 
-
 class Content(models.Model):
 	link = models.URLField()
 	picture = models.URLField()
