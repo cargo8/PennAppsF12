@@ -58,4 +58,20 @@ class Digest(models.Model):
 	timestamp = models.DateField()
 
 
+class Email(models.Model):
+    headers = TextField()
+    text = TextField()
+    html = TextField()
+    to = TextField()
+    cc = TextField()
+    subject = TextField()
+    dkim = JSONField()
+    SPF = JSONField()
+    envelope = JSONField()
+    charsets = CharField(max_length=255)
+    spam_score = FloatField()
+    spam_report = TextField()
+    attachments = ManyToManyField(Attachment)
 
+class Attachment(models.Model)
+	link = Models.URLField()
