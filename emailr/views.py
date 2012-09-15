@@ -6,6 +6,8 @@ from django.views.generic.simple import direct_to_template
 import SmtpApiHeader
 import json
 from django.core.mail import EmailMultiAlternatives
+from emailr.models import *
+from django.views.decorators.http import require_POST
 
 def index(request):
     return render_to_response('index.html')
@@ -62,16 +64,42 @@ def renderEmail(request):
         })
     return render_to_response('email.html', c)
 
-@requires_POST
+@require_POST
 def receiveEmail(request):
     form = EmailForm(request.POST)
-    if form.is_valid()
+    if form.is_valid():
         form.instance.save()
-        for i in range(1,form.cleaned_data.['attachments']+1):
+        for i in range(1,form.cleaned_data['attachments']+1):
             attachment = request.FILES['attachment%d' % i]
             #Use filepicker.io file = attachment.read()
             link = None
             form.instance.attachments.create(link=link)
 
+    post = Post()
     return HttpResponse()
-    
+
+def updateContactList(user, input_strings):
+    for emails in input_strings:
+        if ";" in emails:
+            email_list = emails.split(";")
+        else:
+            email_list = emails.split(",")
+        for email in email_list:
+            email_parts = email.replace('<', ' ').replace('>', ' ').split(" ")
+            address = [x.strip() for x in email_parts]
+            name = [x.strip() for x in email_parts if x not in address]
+            if len(address) == 1:
+                address = address[0]
+                print address
+                contact_user = User.objects.get(email = address.lower())
+                if contact_user is None:
+                    contact_user = User.objects.create(email = address.lower())
+                    contact_user.save
+
+                contacts = user.instance.contacts.filter(user = contact_user)
+
+                if contact is None:
+                    contact = user.instance.contacts.create(user = contact_user)
+
+def generatePost(email):
+    pass
