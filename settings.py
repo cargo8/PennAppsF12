@@ -148,3 +148,10 @@ LOGGING = {
         },
     }
 }
+
+# SendGrid configuration for emails
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_HOST_USER = 'cargo8'
+EMAIL_HOST_PASSWORD = 'password'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
