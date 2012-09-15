@@ -35,7 +35,7 @@ class Content(models.Model):
 	picture = models.URLField()
 
 class Post(models.Model):
-	author = models.ForeignKey(User, related_name='author')
+	author = models.ForeignKey(User, related_name='post_author')
 	recipients = models.ManyToManyField(User, related_name='recipients')
 	subject = models.CharField(max_length=50)
 	text = models.TextField()
@@ -46,7 +46,7 @@ class Post(models.Model):
 
 class Comment(models.Model):
 	post = models.ForeignKey(Post)
-	author = models.ForeignKey(User, related_name='author')
+	author = models.ForeignKey(User, related_name='comment_author')
 	text = models.TextField()
 	content = models.ManyToManyField(Content)
 	likes = models.IntegerField()
