@@ -67,11 +67,12 @@ def renderEmail(request):
         })
     return render_to_response('email.html', c)
 
-#@require_POST
+@require_POST
 def receiveEmail(request):
     print request
-    request.POST['sender'] = request.POST['from']
-    del request.POST['from']
+    if 'from' in request.POST.keyset():
+        request.POST['sender'] = request.POST['from']
+        del request.POST['from']
     form = EmailForm(request.POST)
     if form.is_valid():
         form.instance.save()
