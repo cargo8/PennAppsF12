@@ -4,11 +4,14 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
-    ('Jason Mow', 'jason.mow@gmail.com'),
+    ('Josh Wilson', 'jason.mow@gmail.com'),
 )
 
 MANAGERS = ADMINS
-
+import dj_database_url
+DATABASES = {'default':
+             dj_database_url.config(default='postgres://localhost')}
+"""
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -20,7 +23,7 @@ DATABASES = {
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
 }
-
+"""
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
