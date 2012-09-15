@@ -60,13 +60,13 @@ class Digest(models.Model):
 
 class Attachment(models.Model):
 	link = models.URLField()
-	
+
 #These are for logging. We do not currently expect to access them
 class Email(models.Model):
     headers = models.TextField()
     text = models.TextField()
     html = models.TextField()
-    from = models.TextField()
+    sender = models.TextField()
     to = models.TextField()
     cc = models.TextField()
     subject = models.TextField()
@@ -78,6 +78,6 @@ class Email(models.Model):
     spam_report = models.TextField()
     attachments = models.ManyToManyField(Attachment)
     timestamp = models.DateTimeField(auto_now_add=True)
-    
-    
-    
+
+
+
