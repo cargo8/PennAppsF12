@@ -1,4 +1,4 @@
-# Django settings for pennapps12 project.
+# Django settings for pennappsf12 project.
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -103,7 +103,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
 )
 
-ROOT_URLCONF = 'pennapps12.urls'
+ROOT_URLCONF = 'pennappsf12.urls'
 
 TEMPLATE_DIRS = (
     './templates/',
