@@ -36,7 +36,7 @@ class Content(models.Model):
 
 class Post(models.Model):
 	author = models.ForeignKey(User, related_name='author')
-	recipients = models.ManyToManyField(User, , related_name='recipients')
+	recipients = models.ManyToManyField(User, related_name='recipients')
 	subject = models.CharField(max_length=50)
 	text = models.TextField()
 	content = models.ManyToManyField(Content)
