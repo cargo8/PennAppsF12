@@ -12,6 +12,9 @@ from django.views.decorators.http import require_POST
 def index(request):
     return render_to_response('index.html')
 
+def signup(request):
+    return render_to_response('signup.html')
+
 def renderEmail(request):
 
     hdr = SmtpApiHeader.SmtpApiHeader()
@@ -100,6 +103,7 @@ def parseContacts(user, input_strings):
 
                 if contact is None:
                     contact = user.instance.contacts.create(user = contact_user)
+
 
 # generates a post out of the email and its recipients
 def generatePost(email, recipients):
