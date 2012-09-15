@@ -76,7 +76,7 @@ def renderEmail(request):
         })
     return render_to_response('email.html', c)
 
-@require_POST
+#@require_POST
 def receiveEmail(request):
     print request
     if 'from' in request.POST.keyset():
