@@ -8,7 +8,7 @@ class TryItForm(forms.Form):
 
 
 
-class EmailForm(ModelForm)
+class EmailForm(forms.ModelForm):
     attachments = IntegerField()
     class Meta:
         model = Email
