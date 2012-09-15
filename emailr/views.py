@@ -9,6 +9,7 @@ from django.core.mail import EmailMultiAlternatives
 from emailr.models import *
 from django.views.decorators.http import require_POST
 from emailr.forms import TryItForm
+from django.views.decorators.csrf import csrf_exempt  
 
 def index(request):
     if request.method == 'POST':
@@ -76,7 +77,8 @@ def renderEmail(request):
         })
     return render_to_response('email.html', c)
 
-#@require_POST
+@require_POST
+@csrf_exempt 
 def receiveEmail(request):
     print request
     if 'from' in request.POST.keyset():
