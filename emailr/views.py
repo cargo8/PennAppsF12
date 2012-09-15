@@ -86,16 +86,16 @@ def receiveEmail(request):
             email_form['sender'] = request.POST[key]
         email_form[key] = request.POST[key]
    
-    form = Email(email_form)
-    if form.is_valid():
-        form.instance.save()
-        for i in range(1,form.cleaned_data['attachments']+1):
-            attachment = request.FILES['attachment%d' % i]
-            #Use filepicker.io file = attachment.read()
-            link = None
-            form.instance.attachments.create(link=link)
+    email = Email(email_form)
+    
+    email.instance.save()
+    for i in range(1,email.cleaned_data['attachments']+1):
+        attachment = request.FILES['attachment%d' % i]
+        #Use filepicker.io file = attachment.read()
+        link = None
+        email.instance.attachments.create(link=link)
     contacts = None #parseContacts(None, None)
-    #post = generatePost(form, contacts)
+    #post = generatePost(email, contacts)
     return HttpResponse()
 
 def parseContacts(user, input_strings):
