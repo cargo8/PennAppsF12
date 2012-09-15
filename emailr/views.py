@@ -7,6 +7,9 @@ import SmtpApiHeader
 import json
 from django.core.mail import EmailMultiAlternatives
 
+def index(request):
+    return render_to_response('index.html')
+
 def renderEmail(request):
 
     hdr = SmtpApiHeader.SmtpApiHeader()
