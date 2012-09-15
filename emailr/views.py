@@ -82,13 +82,15 @@ def renderEmail(request):
 def receiveEmail(request):
     email = Email()
     form = EmailForm(request.POST, email)
-    #if form.is_valid():
-    email = form.save()
-    for i in range(1,form.cleaned_data['attachments']+1):
-        attachment = request.FILES['attachment%d' % i]
-        #Use filepicker.io file = attachment.read()
-        link = None
-        email.attachments.create(link=link)
+    if form.is_valid():
+        email = form.save()
+        for i in range(1,form.cleaned_data['attachments']+1):
+            attachment = request.FILES['attachment%d' % i]
+            #Use filepicker.io file = attachment.read()
+            link = None
+            email.attachments.create(link=link)
+    else:
+        print "FUCK THIS"
     contacts = None #parseContacts(None, None)
     #post = generatePost(email, contacts)
     return HttpResponse()
