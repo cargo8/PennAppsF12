@@ -331,6 +331,14 @@
 			#monkeyRewards img{
 				max-width:190px;
 			}
+			pre {
+			 white-space: pre-wrap;       /* css-3 */
+			 white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+			 white-space: -pre-wrap;      /* Opera 4-6 */
+			 white-space: -o-pre-wrap;    /* Opera 7 */
+			 word-wrap: break-word;       /* Internet Explorer 5.5+ */
+			 font-family: 'Arial';
+			}
 		</style>
 	</head>
     <body leftmargin="0" marginwidth="0" topmargin="0" marginheight="0" offset="0">
@@ -348,7 +356,7 @@
                                     	<tr>
                                         	<td valign="top">
                                             	<div mc:edit="std_preheader_content">
-                                                	 Use this area to offer a short teaser of your email's content. Text here will show in the preview area of some email clients.
+                                                	 {% block preview %}{% endblock %}
                                                 </div>
                                             </td>
                                             <!-- *|IFNOT:ARCHIVE_PAGE|* -->
@@ -375,9 +383,8 @@
                                             <td class="headerContent">
                                             
                                             	<!-- // Begin Module: Standard Header Image \\ -->
-                                            	<img src="" style="max-width:600px;" id="headerImage campaign-icon" mc:label="header_image" mc:edit="header_image" mc:allowdesigner mc:allowtext />
+                                            	<img src="/static/emailr.png" style="max-width:600px;" id="headerImage campaign-icon" mc:label="header_image" mc:edit="header_image" mc:allowdesigner mc:allowtext />
                                             	<!-- // End Module: Standard Header Image \\ -->
-                                            
                                             </td>
                                         </tr>
                                     </table>
