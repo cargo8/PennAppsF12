@@ -1,4 +1,5 @@
 from django import forms
+from models import Email
 
 class TryItForm(forms.Form):
     sender = forms.CharField(label="Your email")
@@ -9,7 +10,7 @@ class TryItForm(forms.Form):
 
 
 class EmailForm(forms.ModelForm):
-    attachments = IntegerField()
+    attachments = forms.IntegerField()
     class Meta:
         model = Email
         exclude = 'attachments'
