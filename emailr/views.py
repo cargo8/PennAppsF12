@@ -1,10 +1,14 @@
 from django.http import HttpResponse, Http404, HttpResponseRedirect, HttpRequest
 from django.template import Context, RequestContext, TemplateDoesNotExist
+from django.template.loader import render_to_string
 from django.shortcuts import render_to_response, redirect
 from django.views.generic.simple import direct_to_template
 import SmtpApiHeader
 import json
 from django.core.mail import EmailMultiAlternatives
+
+def index(request):
+    return render_to_response('index.html')
 
 def renderEmail(request):
 
@@ -35,6 +39,7 @@ def renderEmail(request):
     # Create message container - the correct MIME type is multipart/alternative.
     # Using Django's 'EmailMultiAlternatives' class in this case to create and send.
     # Create the body of the message (a plain-text and an HTML version).
+
     # text is your plain-text email
     # html is your html version of the email
     # if the reciever is able to view html emails then only the html
@@ -44,16 +49,10 @@ def renderEmail(request):
 
     text_content = 'Hi -name-!\nHow are you?\n'
 
-    html = """\
-    <html>
-      <head></head>
-      <body>
-        <p>Hi! -name-<br>
-           How are you?<br>
-        </p>
-      </body>
-    </html>
-    """
+    html = render_to_string('email.html', {
+        
+    });    
+
     msg = EmailMultiAlternatives(subject, text_content, fromEmail, [toEmail], headers={"X-SMTPAPI": hdr.asJSON()})
     msg.attach_alternative(html, "text/html")
     #msg.send()

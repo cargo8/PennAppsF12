@@ -13,8 +13,9 @@ urlpatterns = patterns('',
     # url(r'^pennappsf12/', include('pennapps12.foo.urls')),
     
     # url(r'^$', direct_to_template, {'template': 'postcard.html'}),
-    url(r'^$', renderEmail),
+    url(r'^render/', renderEmail),
     
+    url(r'^$', index),
     url(r'^receiveEmail/', receiveEmail),
     
     # Uncomment the admin/doc line below to enable admin documentation:
