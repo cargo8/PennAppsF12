@@ -80,6 +80,7 @@ def renderEmail(request):
 @require_POST
 @csrf_exempt 
 def receiveEmail(request):
+    print request.POST
     email = Email()
     form = EmailForm(request.POST, email)
     if form.is_valid():

@@ -9,7 +9,7 @@ class TryItForm(forms.Form):
 
 
 
-class EmailForm(forms.Form):
+class EmailForm(forms.ModelForm):
     attachments = forms.IntegerField()
     class Meta:
         model = Email
