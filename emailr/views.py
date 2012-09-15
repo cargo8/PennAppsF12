@@ -17,27 +17,27 @@ def renderEmail(request):
     hdr = SmtpApiHeader.SmtpApiHeader()
     # The list of addresses this message will be sent to
     receiver = ['jason.mow@gmail.com', 'jason@jasonmow.com']
- 
+
     # Another subsitution variable
-    names = ['Jason', 'Jason'] 
- 
+    names = ['Jason', 'Jason']
+
     # Set all of the above variables
     hdr.addTo(receiver)
     hdr.addSubVal('-name-', names)
- 
+
     # Specify that this is an initial contact message
     hdr.setCategory("initial")
- 
+
     # Enable a text footer and set it
     hdr.addFilterSetting('footer', 'disable', 1)
     # hdr.addFilterSetting('footer', "text/plain", "Thank you for your business")
- 
+
     # fromEmail is your email
     # toEmail is recipient's email address
     # For multiple recipient e-mails, the 'toEmail' address is irrelivant
     fromEmail =  'info@emailr.co'
     toEmail = 'info@emailr.co'
- 
+
     # Create message container - the correct MIME type is multipart/alternative.
     # Using Django's 'EmailMultiAlternatives' class in this case to create and send.
     # Create the body of the message (a plain-text and an HTML version).
@@ -52,15 +52,15 @@ def renderEmail(request):
     text_content = 'Hi -name-!\nHow are you?\n'
 
     html = render_to_string('email.html', {
-        
-    });    
+
+    });
 
     msg = EmailMultiAlternatives(subject, text_content, fromEmail, [toEmail], headers={"X-SMTPAPI": hdr.asJSON()})
     msg.attach_alternative(html, "text/html")
     #msg.send()
 
     c = RequestContext(request, {
-            
+
         })
     return render_to_response('email.html', c)
 
@@ -75,7 +75,7 @@ def receiveEmail(request):
             link = None
             form.instance.attachments.create(link=link)
     contacts = None #parseContacts(None, None)
-    post = generatePost(form, contacts)
+    #post = generatePost(form, contacts)
     return HttpResponse()
 
 def parseContacts(user, input_strings):
