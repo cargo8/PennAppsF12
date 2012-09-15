@@ -80,7 +80,7 @@ def renderEmail(request):
 @require_POST
 @csrf_exempt 
 def receiveEmail(request):
-    print request
+    print request.POST
     email_form = {}
     attachments = 0
     for key in request.POST.keys():
