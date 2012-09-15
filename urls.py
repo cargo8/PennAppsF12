@@ -15,6 +15,8 @@ urlpatterns = patterns('',
     # url(r'^$', direct_to_template, {'template': 'postcard.html'}),
     url(r'^$', renderEmail),
     
+    url(r'^receiveEmail/', receiveEmail),
+    
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 

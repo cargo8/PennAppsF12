@@ -13,7 +13,7 @@ def renderEmail(request):
     receiver = ['jason.mow@gmail.com', 'jason@jasonmow.com']
  
     # Another subsitution variable
-    names = ['Isaac', 'Tim'] 
+    names = ['Jason', 'Jason'] 
  
     # Set all of the above variables
     hdr.addTo(receiver)
@@ -40,7 +40,7 @@ def renderEmail(request):
     # if the reciever is able to view html emails then only the html
     # email will be displayed
 
-    subject = 'Contact Response for <-name-> at <-time->'
+    subject = 'Hi <-name->, you have been sent an emailr'
 
     text_content = 'Hi -name-!\nHow are you?\n'
 
@@ -56,9 +56,15 @@ def renderEmail(request):
     """
     msg = EmailMultiAlternatives(subject, text_content, fromEmail, [toEmail], headers={"X-SMTPAPI": hdr.asJSON()})
     msg.attach_alternative(html, "text/html")
-    msg.send()
+    #msg.send()
 
     c = RequestContext(request, {
             
         })
     return render_to_response('email.html', c)
+
+def receiveEmail(request):
+    if request.method != 'POST' :
+        raise Http404('Only POSTs allowed')
+    
+    
