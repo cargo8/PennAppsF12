@@ -46,7 +46,7 @@ class Post(models.Model):
 
 class Comment(models.Model):
 	post = models.ForeignKey(Post)
-    writer = models.ForeignKey(User)
+	writer = models.ForeignKey(User)
 	text = models.TextField()
 	content = models.ManyToManyField(Content)
 	likes = models.IntegerField()
