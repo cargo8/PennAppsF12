@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 
 class Contact(models.Model):
-	user = models.ForeignKey(User)
+	owner = models.ForeignKey(User)
 	first_name = models.CharField(max_length=50)
 	last_name = models.CharField(max_length=50)
 
@@ -21,7 +21,7 @@ class EmailPreferences(models.Model):
 	digest_timeframe_days = models.IntegerField(default=1)
 
 class User(models.Model):
-	contacts = models.ManyToManyField(Contact)
+	friends = models.ManyToManyField(Contact)
 	email = models.EmailField()
 	profile_picture = models.URLField()
 	first_name = models.CharField(max_length=50)
