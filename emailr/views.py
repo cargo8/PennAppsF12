@@ -71,6 +71,8 @@ def receiveEmail(request):
         for i in range(1,form.cleaned_data.['attachments']+1):
             attachment = request.FILES['attachment%d' % i]
             #Use filepicker.io file = attachment.read()
-            link = none
+            link = None
             form.instance.attachments.create(link=link)
+
+    return HttpResponse()
     
