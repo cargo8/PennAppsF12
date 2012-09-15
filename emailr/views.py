@@ -86,7 +86,7 @@ def receiveEmail(request):
         if 'from' == key.lower():
             email_form['sender'] = request.POST[key]
         elif 'attachments' == key.lower():
-            attachments = email_form['attachments'
+            attachments = email_form['attachments']
         else:
             email_form[key] = request.POST[key]
    
