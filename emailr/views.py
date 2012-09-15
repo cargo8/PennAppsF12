@@ -86,7 +86,7 @@ def receiveEmail(request):
             email_form['sender'] = request.POST[key]
         email_form[key] = request.POST[key]
    
-    form = EmailForm(email_form)
+    form = Email(email_form)
     if form.is_valid():
         form.instance.save()
         for i in range(1,form.cleaned_data['attachments']+1):
