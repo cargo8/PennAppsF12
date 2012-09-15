@@ -81,7 +81,7 @@ def renderEmail(request):
 @csrf_exempt 
 def receiveEmail(request):
     print request
-    if 'from' in request.POST.keyset():
+    if 'from' in request.POST.keys():
         request.POST['sender'] = request.POST['from']
         del request.POST['from']
     form = EmailForm(request.POST)
