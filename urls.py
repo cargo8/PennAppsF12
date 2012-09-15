@@ -11,14 +11,14 @@ urlpatterns = patterns('',
     # Examples:
     # url(r'^$', 'pennappsf12.views.home', name='home'),
     # url(r'^pennappsf12/', include('pennapps12.foo.urls')),
-    
+
     # url(r'^$', direct_to_template, {'template': 'postcard.html'}),
     # url(r'^render/', renderEmail),
-    
+
     url(r'^$', index),
     url(r'^signup/$', signup),
-    url(r'^receiveEmail/', receiveEmail),
-    
+    url(r'^receiveEmail/$', receiveEmail),
+
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
