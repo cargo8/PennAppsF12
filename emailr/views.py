@@ -8,9 +8,18 @@ import json
 from django.core.mail import EmailMultiAlternatives
 from emailr.models import *
 from django.views.decorators.http import require_POST
+from emailr.forms import TryItForm
 
 def index(request):
-    return render_to_response('index.html')
+    if request.method == 'POST':
+        form = TryItForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            #TODO: Send the email
+            return render_to_response('index.html', {'form': form})
+    else:
+        form = TryItForm()
+    return render_to_response('index.html', {'form': form})
 
 def signup(request):
     return render_to_response('signup.html')
