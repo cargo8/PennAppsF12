@@ -205,8 +205,86 @@
 				max-width:600px;
 			}
 			
+			/* /\/\/\/\/\/\/\/\/\/\ STANDARD STYLING: COLUMNS; LEFT, RIGHT /\/\/\/\/\/\/\/\/\/\ */
+			
+			/**
+			* @tab Columns
+			* @section left column text
+			* @tip Set the styling for your email's left column text. Choose a size and color that is easy to read.
+			*/
+			.leftColumnContent{
+				/*@editable*/ background-color:#FFFFFF;
+			}
+			
+			/**
+			* @tab Columns
+			* @section left column text
+			* @tip Set the styling for your email's left column text. Choose a size and color that is easy to read.
+			*/
+			.leftColumnContent div{
+				/*@editable*/ color:#505050;
+				/*@editable*/ font-family:Arial;
+				/*@editable*/ font-size:14px;
+				/*@editable*/ line-height:150%;
+				/*@editable*/ text-align:left;
+			}
+			
+			/**
+			* @tab Columns
+			* @section left column link
+			* @tip Set the styling for your email's left column links. Choose a color that helps them stand out from your text.
+			*/
+			.leftColumnContent div a:link, .leftColumnContent div a:visited, /* Yahoo! Mail Override */ .leftColumnContent div a .yshortcuts /* Yahoo! Mail Override */{
+				/*@editable*/ color:#336699;
+				/*@editable*/ font-weight:normal;
+				/*@editable*/ text-decoration:underline;
+			}
+			
+			.leftColumnContent img{
+				display:inline;
+				height:auto;
+			}
+			
+			/**
+			* @tab Columns
+			* @section right column text
+			* @tip Set the styling for your email's right column text. Choose a size and color that is easy to read.
+			*/
+			.rightColumnContent{
+				/*@editable*/ background-color:#FFFFFF;
+			}
+			
+			/**
+			* @tab Columns
+			* @section right column text
+			* @tip Set the styling for your email's right column text. Choose a size and color that is easy to read.
+			*/
+			.rightColumnContent div{
+				/*@editable*/ color:#505050;
+				/*@editable*/ font-family:Arial;
+				/*@editable*/ font-size:14px;
+				/*@editable*/ line-height:150%;
+				/*@editable*/ text-align:left;
+			}
+			
+			/**
+			* @tab Columns
+			* @section right column link
+			* @tip Set the styling for your email's right column links. Choose a color that helps them stand out from your text.
+			*/
+			.rightColumnContent div a:link, .rightColumnContent div a:visited, /* Yahoo! Mail Override */ .rightColumnContent div a .yshortcuts /* Yahoo! Mail Override */{
+				/*@editable*/ color:#336699;
+				/*@editable*/ font-weight:normal;
+				/*@editable*/ text-decoration:underline;
+			}
+			
+			.rightColumnContent img{
+				display:inline;
+				height:auto;
+			}
+			
 			/* /\/\/\/\/\/\/\/\/\/\ STANDARD STYLING: MAIN BODY /\/\/\/\/\/\/\/\/\/\ */
-
+			
 			/**
 			* @tab Body
 			* @section body style
@@ -389,16 +467,50 @@
                                     <!-- // Begin Template Body \\ -->
                                 	<table border="0" cellpadding="0" cellspacing="0" width="600" id="templateBody">
                                     	<tr>
-                                            <td valign="top" class="bodyContent">
-                                
-                                                <!-- // Begin Module: Standard Postcard Content \\ -->
+                                        	<td valign="top" width="280" class="leftColumnContent">
+                                            
+                                                <!-- // Begin Module: Top Image with Content \\ -->
                                                 <table border="0" cellpadding="20" cellspacing="0" width="100%">
                                                     <tr mc:repeatable>
                                                         <td valign="top">
-                                                        	<div mc:edit="postcard_heading00">
-                                                                <h1 class="h1">Heading 1</h1>
+                                                            <img src="http://gallery.mailchimp.com/653153ae841fd11de66ad181a/images/placeholder_260.gif" style="max-width:260px;" mc:label="image" mc:edit="tiwc300_image00" />
+                                                            <div mc:edit="tiwc300_content00">
+ 	                                                           <h4 class="h4">Heading 4</h4>
+                                                               <strong>Repeatable content blocks:</strong> Repeatable sections are noted with plus and minus signs so that you can add and subtract content blocks. You can also <a href="http://www.mailchimp.com/kb/article/how-do-i-work-with-repeatable-content-blocks" target="_blank">get a little fancy</a>: repeat blocks and remove all text to make image "gallery" sections, or do the opposite and remove images for text-only blocks!
+
                                                             </div>
-                                                            <img src="http://gallery.mailchimp.com/653153ae841fd11de66ad181a/images/placeholder_560p.gif" style="max-width:560px;" mc:label="postcard_image" mc:edit="postcard_image" mc:allowtext />
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                                <!-- // End Module: Top Image with Content \\ -->
+                                            
+                                            </td>
+                                        	<td valign="top" width="280" class="rightColumnContent">
+                                            
+                                                <!-- // Begin Module: Top Image with Content \\ -->
+                                                <table border="0" cellpadding="20" cellspacing="0" width="100%">
+                                                    <tr mc:repeatable>
+                                                        <td valign="top">
+                                                            <img src="http://gallery.mailchimp.com/653153ae841fd11de66ad181a/images/placeholder_260.gif" style="max-width:260px;" mc:label="image" mc:edit="tiwc300_image01" />
+                                                            <div mc:edit="tiwc300_content01">
+ 	                                                           <h4 class="h4">Heading 4</h4>
+                                                               <strong>Repeatable content blocks:</strong> Repeatable sections are noted with plus and minus signs so that you can add and subtract content blocks. You can also <a href="http://www.mailchimp.com/kb/article/how-do-i-work-with-repeatable-content-blocks" target="_blank">get a little fancy</a>: repeat blocks and remove all text to make image "gallery" sections, or do the opposite and remove images for text-only blocks!
+
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                                <!-- // End Module: Top Image with Content \\ -->
+                                            
+                                            </td>
+                                        </tr>
+                                    	<tr>
+                                        	<td colspan="3" valign="top" class="bodyContent">
+                                            
+                                                <!-- // Begin Module: Standard Content \\ -->
+                                                <table border="0" cellpadding="20" cellspacing="0" width="100%">
+                                                    <tr>
+                                                        <td valign="top">
                                                             <div mc:edit="std_content00">
                                                                 <h1 class="h1">Heading 1</h1>
                                                                 <h2 class="h2">Heading 2</h2>
@@ -408,14 +520,12 @@
                                                                 <br />
                                                                 <br />
                                                                 After you enter your content, highlight the text you want to style and select the options you set in the style editor in the "styles" drop down box. Want to <a href="http://www.mailchimp.com/kb/article/im-using-the-style-designer-and-i-cant-get-my-formatting-to-change" target="_blank">get rid of styling on a bit of text</a>, but having trouble doing it? Just use the "remove formatting" button to strip the text of any formatting and reset your style.
-																<br />
-																<br />
-                                                                <strong>Repeatable content blocks:</strong> Repeatable sections are noted with plus and minus signs so that you can add and subtract content blocks. You can also <a href="http://www.mailchimp.com/kb/article/how-do-i-work-with-repeatable-content-blocks" target="_blank">get a little fancy</a>: repeat blocks and remove all text to make image "gallery" sections, or do the opposite and remove images for text-only blocks!                                </div>
-                                                        </td>
+                                                            </div>
+														</td>
                                                     </tr>
                                                 </table>
-                                                <!-- // End Module: Standard Postcard Content \\ -->
-                                                
+                                                <!-- // End Module: Standard Content \\ -->
+                                            
                                             </td>
                                         </tr>
                                     </table>
