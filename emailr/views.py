@@ -74,11 +74,11 @@ def receiveEmail(request):
             #Use filepicker.io file = attachment.read()
             link = None
             form.instance.attachments.create(link=link)
-
-    post = Post()
+    contacts = None #parseContacts(None, None)
+    post = generatePost(form, contacts)
     return HttpResponse()
 
-def updateContactList(user, input_strings):
+def parseContacts(user, input_strings):
     for emails in input_strings:
         if ";" in emails:
             email_list = emails.split(";")
@@ -101,5 +101,5 @@ def updateContactList(user, input_strings):
                 if contact is None:
                     contact = user.instance.contacts.create(user = contact_user)
 
-def generatePost(email):
+def generatePost(email, contacts):
     pass
