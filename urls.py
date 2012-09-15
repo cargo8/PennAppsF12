@@ -1,3 +1,4 @@
+from django.views.generic.simple import direct_to_template, redirect_to
 from django.conf.urls.defaults import patterns, include, url
 
 # Uncomment the next two lines to enable the admin:
@@ -8,7 +9,7 @@ urlpatterns = patterns('',
     # Examples:
     # url(r'^$', 'pennappsf12.views.home', name='home'),
     # url(r'^pennappsf12/', include('pennapps12.foo.urls')),
-
+    url(r'^$', direct_to_template, {'template': 'postcard.html'}),
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
