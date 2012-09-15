@@ -66,6 +66,7 @@ class Email(models.Model):
     headers = models.TextField()
     text = models.TextField()
     html = models.TextField()
+    from = models.TextField()
     to = models.TextField()
     cc = models.TextField()
     subject = models.TextField()
@@ -77,3 +78,6 @@ class Email(models.Model):
     spam_report = models.TextField()
     attachments = models.ManyToManyField(Attachment)
     timestamp = models.DateTimeField(auto_now_add=True)
+    
+    
+    

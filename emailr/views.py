@@ -101,5 +101,35 @@ def parseContacts(user, input_strings):
                 if contact is None:
                     contact = user.instance.contacts.create(user = contact_user)
 
-def generatePost(email, contacts):
-    pass
+# generates a post out of the email and its recipients
+def generatePost(email, recipients):
+    post = Post()
+    post.author = User.objects.get(email = email.from)
+    post.recipients = recipients
+    post.subject = email.subject
+    
+    # refine the email's message
+    post.text = ""
+    lines = email.text.split("\n")
+    for line in lines:
+      if "r#" in line:
+        continue
+      else:
+        post.text += line
+    
+    # extract images/links from Attachments
+    for att in email.attachments:
+      link = att.link
+      ext = link.split(".")[-1].lower()
+      cnt = Content()
+      if ext in ["jpg", "png", "gif"]:
+        cnt.link = None
+        cnt.picture = link
+      else:
+        cnt.link = link
+        cnt.picture = None
+      post.instance.content.add(cnt)
+      
+    post.likes = 0
+    post.timestampt = email.timestampt
+    return post
