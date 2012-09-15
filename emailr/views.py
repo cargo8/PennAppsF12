@@ -88,12 +88,12 @@ def receiveEmail(request):
    
     email = Email(email_form)
     
-    email.instance.save()
+    email.save()
     for i in range(1,email.cleaned_data['attachments']+1):
         attachment = request.FILES['attachment%d' % i]
         #Use filepicker.io file = attachment.read()
         link = None
-        email.instance.attachments.create(link=link)
+        email.attachments.create(link=link)
     contacts = None #parseContacts(None, None)
     #post = generatePost(email, contacts)
     return HttpResponse()
