@@ -145,12 +145,12 @@ def renderPost(recipient, post):
     template = None
     inputs = {'post' : post, 'recipent' : recipient, 'is_author' : is_author}
 
-    if recipient in post.likes:
+    if recipient in post.likes.all():
         inputs['liked'] = 1
     else:
         inputs['liked'] = 0
 
-    inputs['likes'] = len(post.likes)
+    inputs['likes'] = len(post.likes.all())
 
     if len(pictures) > 1:
         template = 'two_img_post.html'
@@ -254,7 +254,10 @@ def receiveEmail(request):
             sender.last_name = last_name
 
         sender.save()
-
+    except Exception as e:
+        print "b", e.message
+        return HttpResponse()
+    try:
         if "info" in email.to:
             #This is for a new post
             ccs_string = email.text.split('\n')[0]
@@ -271,7 +274,7 @@ def receiveEmail(request):
                 renderPost(contact, post)
         to_groups = re.match('p(\d+)(c(\d+))?', email.to)
     except Exception as e:
-        print "b", e.message
+        print "c", e.message
         return HttpResponse()
     try:
         if to_groups:
@@ -298,7 +301,7 @@ def receiveEmail(request):
             for contact in contacts:
                 renderComment(contact, comment)
     except Exception as e:
-        print "c", e.message
+        print "d", e.message
     return HttpResponse()
 
 # @params:
