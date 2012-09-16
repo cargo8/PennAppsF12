@@ -168,7 +168,7 @@ def renderPost(recipient, post):
     elif len(pictures) == 1:
         template = 'one_img_post.html'
         inputs['img1'] = pictures[0]
-        print pictures[0]
+        print pictures[0].link
         inputs['other_attachments'] = links + files
         print "loading one image"
     elif len(links) > 0:
@@ -189,8 +189,25 @@ def renderPost(recipient, post):
     
 
 def renderComment(recipient, comment):
-    #Check if recipent = comment.author
-    pass
+    hdr = SmtpApiHeader.SmtpApiHeader()
+    hdr.setCategory("initial")  
+    replyToEmail = "p" + str(comment.post.id) + "c" + str(comment.id) + "@emailr.co"
+    
+    fromEmail =  "info@emailr.co"
+    toEmail = recipient.email.strip()
+
+    is_author = recipient == comment.author
+
+    template = 'text_post.html'
+    #inputs = {'comment' : comment, 'recipent' : recipient, 'is_author' : is_author}
+    inputs = {'post' : comment, 'recipent' : recipient, 'is_author' : is_author}
+
+    html = render_to_string(template, inputs);
+    
+    msg = EmailMultiAlternatives(comment.post.subject, comment.text, fromEmail, [toEmail], headers={"Reply-To" : replyToEmail, "X-SMTPAPI": hdr.asJSON()})
+    msg.attach_alternative(html, "text/html")
+    msg.send()
+
 
 @require_POST
 @csrf_exempt 
@@ -235,7 +252,6 @@ def receiveEmail(request):
             #Use filepicker.io file = attachment.read()
             print "Before link"
             link = save_image(attachment)
-            print link
             email.attachments.create(link=link)
     except Exception as e:
         print 'a', e
