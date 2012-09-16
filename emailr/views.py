@@ -82,14 +82,12 @@ def testRender(request):
 
 def renderPost(recipient, post):
     #Check if recipent = post.author
-    print "########################################"
     hdr = SmtpApiHeader.SmtpApiHeader()
 
     # Specify that this is an initial contact message
     hdr.setCategory("initial")  
     replyToEmail = "p" + str(post.id) + "@emailr.co"
     hdr.setReplyTo(replyToEmail)
-    print "#####################"
 
     fromEmail =  "info@emailr.co"
     toEmail = recipient.email
@@ -111,7 +109,6 @@ def renderPost(recipient, post):
     pictures = []
     links = []
     files = []
-    print "#"
 
     for attachment in post.content.all():
         if attachment.link_type == attachment.PICTURE:
@@ -123,7 +120,6 @@ def renderPost(recipient, post):
 
     template = None
     inputs = {'post' : post, 'recipent' : recipient, 'is_author' : is_author}
-    print "########################################"
 
     if len(pictures) > 1:
         template = 'two_img_post.html'
@@ -144,14 +140,14 @@ def renderPost(recipient, post):
         template = 'text_post.html'
         inputs['other_attachments'] = files
 
+    try:
+        html = render_to_string(template, inputs);
 
-    print str(toEmail)
-
-    html = render_to_string(template, inputs);
-
-    msg = EmailMultiAlternatives(subject, text_content, fromEmail, [toEmail], headers={"X-SMTPAPI": hdr.asJSON()})
-    msg.attach_alternative(html, "text/html")
-    msg.send()
+        msg = EmailMultiAlternatives(subject, text_content, fromEmail, [toEmail], headers={"X-SMTPAPI": hdr.asJSON()})
+        msg.attach_alternative(html, "text/html")
+        msg.send()
+    except Exception as e:
+        print e
 
 def renderComment(recipient, comment):
     #Check if recipent = comment.author
@@ -258,7 +254,6 @@ def parseContacts(user, ccs_string):
     recipients = []
 
     for contact in contacts:
-        print contact
         c_email = contact[1]
            
         # find or create user from parsed info 
