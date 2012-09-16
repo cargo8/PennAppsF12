@@ -224,7 +224,7 @@ def receiveEmail(request):
             attachment = request.FILES['attachment%d' % i]
             #Use filepicker.io file = attachment.read()
             link = save_image(attachment)
-        email.attachments.create(link=link)
+            email.attachments.create(link=link)
     except Exception as e:
         print e.message
     print 2
