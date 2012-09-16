@@ -12,6 +12,10 @@ from django.views.decorators.http import require_POST
 from emailr.forms import *
 from django.views.decorators.csrf import csrf_exempt
 
+#######################################################
+###### WEB CLIENT VIEW CODE ###########################
+#######################################################
+
 def index(request):
     if request.method == 'POST':
         form = TryItForm(request.POST)
@@ -29,13 +33,12 @@ def signup(request):
 def login(request):
     return render_to_response('login.html')
 
-def renderComment(recipient, comment):
-    #Check if recipent = comment.author
-    pass
-
 def testRender(request):
     return render_to_response('one_img_post.html')
 
+#######################################################
+###### BACKEND PROCESSING CODE ########################
+#######################################################
 
 def renderPost(recipient, post):
     #Check if recipent = post.author
@@ -106,6 +109,10 @@ def renderPost(recipient, post):
 
     c = RequestContext(request, inputs)
     return render_to_response(template, c)
+
+def renderComment(recipient, comment):
+    #Check if recipent = comment.author
+    pass
 
 @require_POST
 @csrf_exempt 
