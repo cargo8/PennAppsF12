@@ -7,18 +7,40 @@
   <h1>Sign up for Emailr</h1>
   <p>Begin your social email experience today.</p>
   <p>
-    <form class="form-horizontal">
+    <form class="form-horizontal" >
 	  <div class="control-group">
 	    <label class="control-label" for="inputEmail">Email</label>
 	    <div class="controls">
-	      <input type="text" id="inputEmail" placeholder="Email">
+	      <input type="text" id="inputEmail">
 	    </div>
+       
+       <label class="control-label" for="inputImg">Profile Pic</label>
+       <div class="controls">
+           <input type="hidden" id="imageLink" />
+           <input type="file" id="upFile" />
+            <img id="localSpinner" class="hide" src="https://filepicker_static.s3.amazonaws.com/ce7b147/img/throbber.gif" alt="Loading..."/>
+       </div>
 	  </div>
 
 		<div class="form-actions">
 		  <a href="/"><button type="button" class="btn">Cancel</button></a>
-		  <button type="submit" class="btn btn-primary">Sign up &raquo;</button>
+		  <button type="text" class="btn btn-primary" data-fp-url="" id="signup">Sign up &raquo;</button>
 		</div>
+      
+      <script>
+         $(document).ready(function() {
+            $("#signup").click(function() {
+               if($("#upFile").val() && $("#inputEmail").val()) {
+                 $('#localSpinner').show();
+                 filepicker.uploadFile(document.getElementById("upFile"), function(data){
+                     $('#imageLink').val(data.url);
+                     $('#localSpinner').hide();
+                 });
+               }
+               else alert("Missing fields");
+            });
+         });
+      </script>
 	  
 	</form>
   </p>
