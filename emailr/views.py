@@ -154,7 +154,8 @@ def receiveEmail(request):
     ccs_string = email.text.split('\n')[0]
     if "r#" in ccs_string:
         ccs_string = ccs_string.replace("r#", "")
-    sender = User.objects.get_or_create(email = email)[0]
+
+    sender = User.objects.get_or_create(email = email.sender)[0]
     contacts = parseContacts(sender , ccs_string)
     post = generatePost(email, sender, contacts)
     
@@ -202,7 +203,7 @@ def parseContacts(user, ccs_string):
         c_email = contact[1]
            
         # find or create user from parsed info 
-        contact_user = user.contacts.get_or_create(email = c_email.lower())[0]
+        contact_user = user.contacts.get_or_create(email = c_email)[0]
         contact_user.save()
         
         # add parsed user to recipient list
