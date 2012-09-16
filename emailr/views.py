@@ -90,7 +90,7 @@ def renderPost(recipient, post):
     hdr.setReplyTo(replyToEmail)
     print hdr
     fromEmail =  "info@emailr.co"
-    toEmail = recipient.email.trim()
+    toEmail = recipient.email.strip()
 
     # text is your plain-text email
     # html is your html version of the email
@@ -223,7 +223,7 @@ def receiveEmail(request):
         """
 
     except Exception as e:
-        print e
+        print e.message
 
     return HttpResponse()
 
