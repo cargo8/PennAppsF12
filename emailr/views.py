@@ -147,6 +147,8 @@ def receiveEmail(request):
 #   Adds contacts to user
 def parseContacts(user, ccs_string):
     contacts = re.findall('([a-zA-Z]+)(\s[a-zA-Z]+)?\s+<(([^<>,;"]+|".+")+)>(,\s+)?', ccs_string)
+    recipients = []
+
     for contact in contacts:
         for i in range(len(contact)):
             c_fname = contact_user[0]
@@ -157,11 +159,19 @@ def parseContacts(user, ccs_string):
                     break
                 c_lname += contact_user[i] + " "
             c_lname = c_lname.strip()
-            
+           
+            # find or create user from parsed info 
             contact_user = User.objects.get_or_create(email = c_email.lower(), first_name = c_fname, last_name = c_lname)[0]
             contact_user.save()
+            
+            # add parsed user to recipient list
+            recipients.append(contact_user)
+
+            # add new contact user to sender's contacts
             contact = user.instance.contacts.get_or_create(user = contact_user)
             contact.save()
+
+            return recipients
 
 # generates a post out of the email and its recipients
 def generatePost(email, recipients):
