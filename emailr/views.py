@@ -112,7 +112,6 @@ def receiveEmail(request):
     data = request.POST
     attachments = 0
 
-    print data['from']
     print data[u'from']
 
     if 'from' in data.keys():
