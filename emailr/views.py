@@ -140,14 +140,12 @@ def renderPost(recipient, post):
         template = 'text_post.html'
         inputs['other_attachments'] = files
 
-    try:
-        html = render_to_string(template, inputs);
+    html = render_to_string(template, inputs);
 
-        msg = EmailMultiAlternatives(subject, text_content, fromEmail, [toEmail], headers={"X-SMTPAPI": hdr.asJSON()})
-        msg.attach_alternative(html, "text/html")
-        msg.send()
-    except Exception as e:
-        print e
+    msg = EmailMultiAlternatives(subject, text_content, fromEmail, [toEmail], headers={"X-SMTPAPI": hdr.asJSON()})
+    msg.attach_alternative(html, "text/html")
+    msg.send()
+    
 
 def renderComment(recipient, comment):
     #Check if recipent = comment.author
@@ -202,26 +200,31 @@ def receiveEmail(request):
 
     #This is for a new post
     ###########################################
-    ccs_string = email.text.split('\n')[0]
-    if "r#" in ccs_string:
-        ccs_string = ccs_string.replace("r#", "")
-    else:
-        ccs_string = None
+    try:
+        ccs_string = email.text.split('\n')[0]
+        if "r#" in ccs_string:
+            ccs_string = ccs_string.replace("r#", "")
+        else:
+            ccs_string = None
 
-    sender = User.objects.get_or_create(email = email.sender)[0]
-    contacts = parseContacts(sender , ccs_string)
-    post = generatePost(email, sender, contacts)
-    renderPost(sender, post)
-    for contact in contacts:
-        renderPost(contact, post)
-    ##
+        sender = User.objects.get_or_create(email = email.sender)[0]
+        contacts = parseContacts(sender , ccs_string)
+        post = generatePost(email, sender, contacts)
+        renderPost(sender, post)
+        for contact in contacts:
+            renderPost(contact, post)
+        ##
 
-    #Comment
-    """
-    renderComment(sender, post)
-    for contact in contacts:
-        renderComment(contact, post)
-    """
+        #Comment
+        """
+        renderComment(sender, post)
+        for contact in contacts:
+            renderComment(contact, post)
+        """
+
+    except Exception as e:
+        print e
+
     return HttpResponse()
 
 # @params:
