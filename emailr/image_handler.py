@@ -11,5 +11,7 @@ def save_image(instream):
 	print "After 1"
 	k = Key(bucket)
 	k.key = str(time.localtime()) + str(random.randint(0,5000))
-	k.send_file(instream)
+	print "After 1]2"
+	k.send_file(instream.read())
+	print "Before return  1"
 	return k.generate_url(100000000)
