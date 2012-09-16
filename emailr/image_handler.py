@@ -9,5 +9,5 @@ def save_image(instream):
 	bucket = conn.lookup('emailr_file_storage')
 	k = Key(bucket)
 	k.key = str(time.localtime()) + str(random.randint(0,5000))
-	key.send_file(instream)
-	return key.generate_url(100000000)
+	k.send_file(instream)
+	return k.generate_url(100000000)
