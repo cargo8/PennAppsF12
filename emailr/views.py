@@ -8,7 +8,7 @@ import json
 from django.core.mail import EmailMultiAlternatives
 from emailr.models import *
 from django.views.decorators.http import require_POST
-from emailr.forms import EmailForm
+from emailr.forms import EmailForm, TryItForm
 from django.views.decorators.csrf import csrf_exempt  
 
 def index(request):
@@ -28,7 +28,7 @@ def signup(request):
 def login(request):
     return render_to_response('login.html')
 
-def renderEmail(request):
+def renderEmail(from_email, receiver_email, subject, post, commment = None):
 
     hdr = SmtpApiHeader.SmtpApiHeader()
     # The list of addresses this message will be sent to
@@ -73,7 +73,7 @@ def renderEmail(request):
 
     msg = EmailMultiAlternatives(subject, text_content, fromEmail, [toEmail], headers={"X-SMTPAPI": hdr.asJSON()})
     msg.attach_alternative(html, "text/html")
-    #msg.send()
+    msg.send()
 
     c = RequestContext(request, {
 
@@ -126,9 +126,8 @@ def receiveEmail(request):
             #Use filepicker.io file = attachment.read()
             link = None
             email.attachments.create(link=link)
-    else:
-            print "FUCK THIS"
-    contacts = None #parseContacts(None, None)
+
+    contacts = parseContacts(email , None)
     #post = generatePost(email, contacts)
     return HttpResponse()
 
