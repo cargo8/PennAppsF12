@@ -274,33 +274,33 @@ def receiveEmail(request):
         
         contacts = parseContacts(sender , ccs_string)
         post = generatePost(email, sender, contacts)
-        try:
-            renderPost(sender, post)
-            for contact in contacts:
-                renderPost(contact, post)
-            print "HELLO WORLD"
-        except Exception as e:
-            print e.message
-    to_groups = re.match('p(\d+)(c(\d+))?', email.to)
-    if to_groups:
-        post = Post.objects.get(id = to_groups.group(1))
-        if to_groups.group(3):
-            last_comment = Comment.objects.get(id = to_groups.group(3))
-            content = []
-            for att in email.attachments.all():
-                link = att.link
-                ext = link.split(".")[-1].lower()
-                cnt = Content()
-                cnt.link = link
-                if ext in ["jpg", "png", "gif"]:
-                    cnt.link_type = cnt.PICTURE
-                else:
-                    cnt.link_type = cnt.FILE
-                content.add(cnt)
-        comment = Comment.objects.create(author = sender, text = email.text, post = post, content = content)
-        contacts = post.recipients + post.author
+        
+        renderPost(sender, post)
         for contact in contacts:
-            renderComment(contact, comment)
+            renderPost(contact, post)
+    to_groups = re.match('p(\d+)(c(\d+))?', email.to)
+    try:
+        if to_groups:
+            post = Post.objects.get(id = to_groups.group(1))
+            if to_groups.group(3):
+                last_comment = Comment.objects.get(id = to_groups.group(3))
+                content = []
+                for att in email.attachments.all():
+                    link = att.link
+                    ext = link.split(".")[-1].lower()
+                    cnt = Content()
+                    cnt.link = link
+                    if ext in ["jpg", "png", "gif"]:
+                        cnt.link_type = cnt.PICTURE
+                    else:
+                        cnt.link_type = cnt.FILE
+                    content.add(cnt)
+            comment = Comment.objects.create(author = sender, text = email.text, post = post, content = content)
+            contacts = post.recipients + post.author
+            for contact in contacts:
+                renderComment(contact, comment)
+    except Exception as e:
+        print e.message
     return HttpResponse()
 
 # @params:
