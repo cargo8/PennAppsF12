@@ -233,14 +233,20 @@ def receiveEmail(request):
         return HttpResponse()
     print "past 2"
     try:
-        if "info" in email.to:
-            #This is for a new post
-            ccs_string = email.text.split('\n')[0]
-            if "r#" in ccs_string:
-                ccs_string = ccs_string.replace("r#", "")
+        sender_email = re.findall('(([^, ]+)(\s*,\s*)?)', email.sender)
+        first_last = email.sender.split(" ")
+        first_name = None
+        last_name = None
+        if "@" not in first_last[0]:
+            if "," not in first_last[0]:
+                first_name = first_last[0]
             else:
-                last_name = first_last[1]
-
+                last_name = first_last[0]
+            if len(first_last) > 2 and "@" not in first_last[1]:
+                if last_name:
+                    first_name = first_last[1]
+                else:
+                    last_name = first_last[1]
         sender = User.objects.get_or_create(email = sender_email[0][1])[0]
         if not sender.first_name:
             sender.first_name = first_name
@@ -248,6 +254,7 @@ def receiveEmail(request):
             sender.last_name = last_name
 
         sender.save()
+
         if "info" in email.to:
             #This is for a new post
             ccs_string = email.text.split('\n')[0]
