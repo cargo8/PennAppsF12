@@ -288,7 +288,7 @@ def receiveEmail(request):
         print "b", e.message
         return HttpResponse()
     try:
-        if "info" in email.to:
+        if "p" not in email.to[:2]:
             #This is for a new post
             ccs_string = email.text.split('\n')[0]
             if "r#" in ccs_string:
