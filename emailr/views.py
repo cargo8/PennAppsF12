@@ -29,47 +29,55 @@ def signup(request):
 def login(request):
     return render_to_response('login.html')
 
+<<<<<<< HEAD
 def renderEmail(from_email, receiver_email, subject, post, commment = None):
+=======
+def sendPostEmail(request):
+
+    pref1 = EmailPreferences()
+    pref1.save()
+    pref2 = EmailPreferences()
+    pref2.save()
+
+    user1 = User(first_name = 'Jason', last_name = 'Mow', activated = True, email = 'jason.mow@gmail.com', email_preferences = pref1)
+    user1.save()
+
+    user2 = User(first_name = 'Ron', last_name = 'Weasley', activated = True, email = 'jason@jasonmow.com', email_preferences = pref2)
+    user2.save()
+    
+    post = Post(author = user1, subject = 'Testing out Emailr Templates', text = 'Hey I just want to test that this template works', likes = 0)
+    post.save()
+>>>>>>> a35fbe38a617a683a7d38ffa2c465a3983380cdf
 
     hdr = SmtpApiHeader.SmtpApiHeader()
     # The list of addresses this message will be sent to
-    receiver = ['jason.mow@gmail.com', 'jason@jasonmow.com']
+    #TODO: extract recipient emails from User objects
+    recipients = post.recipients.all()
 
-    # Another subsitution variable
-    names = ['Jason', 'Jason']
-
-    # Set all of the above variables
-    hdr.addTo(receiver)
-    hdr.addSubVal('-name-', names)
+    hdr.addTo(recipients)
 
     # Specify that this is an initial contact message
     hdr.setCategory("initial")
 
-    # Enable a text footer and set it
-    hdr.addFilterSetting('footer', 'disable', 1)
-    # hdr.addFilterSetting('footer', "text/plain", "Thank you for your business")
-
-    # fromEmail is your email
     # toEmail is recipient's email address
     # For multiple recipient e-mails, the 'toEmail' address is irrelivant
     fromEmail =  'info@emailr.co'
     toEmail = 'info@emailr.co'
-
-    # Create message container - the correct MIME type is multipart/alternative.
-    # Using Django's 'EmailMultiAlternatives' class in this case to create and send.
-    # Create the body of the message (a plain-text and an HTML version).
 
     # text is your plain-text email
     # html is your html version of the email
     # if the reciever is able to view html emails then only the html
     # email will be displayed
 
-    subject = 'Hi <-name->, you have been sent an emailr'
+    subject = post.subject
+    
+    name =  post.author.first_name + " " + post.author.last_name
+    text_content = name + " has shared something with you using Emailr:\n\n" + post.text
+    text_content += "\n\n\nIf you would like to comment on this post just reply to this email."
 
-    text_content = 'Hi -name-!\nHow are you?\n'
-
-    html = render_to_string('email.html', {
-
+    html = render_to_string('postcard.html', {
+        'message_text': post.text,
+        
     });
 
     msg = EmailMultiAlternatives(subject, text_content, fromEmail, [toEmail], headers={"X-SMTPAPI": hdr.asJSON()})
@@ -79,7 +87,7 @@ def renderEmail(from_email, receiver_email, subject, post, commment = None):
     c = RequestContext(request, {
 
         })
-    return render_to_response('email.html', c)
+    return render_to_response('postcard.html', c)
 
 @require_POST
 @csrf_exempt 
@@ -135,7 +143,6 @@ def receiveEmail(request):
     sender = User.objects.get_or_create(email = email.lower())
     contacts = parseContacts(sender , ccs_string)
     post = generatePost(email, sender, contacts)
-
     return HttpResponse()
 
 # @params:
@@ -149,33 +156,32 @@ def receiveEmail(request):
 #@returns : all recipients
 
 def parseContacts(user, ccs_string):
-    contacts = re.findall('([a-zA-Z,]+)(\s[a-zA-Z]+)?\s+<(([^<>,;"]+|".+")+)>(,\s+)?', ccs_string)
+    contacts = re.findall('([a-zA-Z]+)(\s[a-zA-Z]+)?\s+<(([^<>,;"]+|".+")+)>(,\s+)?', ccs_string)
     recipients = []
 
     for contact in contacts:
-        email = [x for x in contact if '@' in x]
-        if len(email) < 1:
-            continue
+        for i in range(len(contact)):
+            c_fname = contact_user[0]
+            c_lname = c_email = ""
+            for i in range(1, len(contact_user)):
+                if "@" in contact_user[i]:
+                    c_email = contact_user[i]
+                    break
+                c_lname += contact_user[i] + " "
+            c_lname = c_lname.strip()
+           
+            # find or create user from parsed info 
+            contact_user = User.objects.get_or_create(email = c_email.lower(), first_name = c_fname, last_name = c_lname)[0]
+            contact_user.save()
+            
+            # add parsed user to recipient list
+            recipients.append(contact_user)
 
-        email = email[0]
-        contact_user = User.objects.get_or_create(email = email.lower())[0]
-        contact_user.save()
-        recipients.append(contact_user)
+            # add new contact user to sender's contacts
+            contact = user.instance.contacts.get_or_create(user = contact_user)
+            contact.save()
 
-        if(email in contact[:2]):
-            first_name = contact[0]
-            last_name = None
-        else:
-            last_name = contact[1]
-            first_name = contact[0]
-            if first_name[-1] == ',':
-                last_name = first_name
-                first_name = contact[1]
-
-        contact = user.instance.contacts.get_or_create(user = contact_user, first_name = first_name, last_name = last_name)
-        contact.save()
     return recipients
-
 
 # generates a post out of the email and its recipients
 def generatePost(email, sender, recipients):
@@ -184,8 +190,7 @@ def generatePost(email, sender, recipients):
     post.recipients = recipients
     post.subject = email.subject
 
-    # refine the email's message
-    post.text = ""
+    post.text = email.text
     #lines = email.text.split("\n")
     lines = re.split(r'[\n\r]+', email.text)
     for line in lines:
