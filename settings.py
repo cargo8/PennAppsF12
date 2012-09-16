@@ -148,13 +148,6 @@ LOGGING = {
             'stream' : sys.stdout
         }
     },
-    'loggers': {
-        'django.request': {
-            'handlers': ['mail_admins'],
-            'level': 'ERROR',
-            'propagate': True,
-        },
-    }
 }
 
 # SendGrid configuration for emails
