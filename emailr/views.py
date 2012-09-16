@@ -110,6 +110,8 @@ def receiveEmail(request):
     output = {}
 
     data = request.POST
+    for key in data.keys():
+        print key
     attachments = 0
 
     print data[u'from']
