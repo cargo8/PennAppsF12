@@ -15,7 +15,6 @@ urlpatterns = patterns('',
     url(r'^signup/$', signup),
     url(r'^register/$', register),
     url(r'login/', login),
-    url(r'^login/$', login),
     url(r'logout/$', logout),
     url(r'^receiveEmail/$', receiveEmail),
 

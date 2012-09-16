@@ -20,8 +20,6 @@ from django.views.decorators.csrf import csrf_exempt
 #######################################################
 
 def index(request):
-    if request.user.is_authenticated:
-        return redirect(home)
     if request.method == 'POST':
         form = TryItForm(request.POST)
         if form.is_valid():
@@ -67,7 +65,7 @@ def login(request):
 def logout(request):
     auth.logout(request)
     form = TryItForm()
-    return render_to_response('index.html', {'request': request, 'form': form, 'msg': 'You have successfully logged out.'})
+    return render_to_response('index.html', {'form': form, 'msg': 'You have successfully logged out.'})
 
 def register(request):
     if request.method == 'POST':
@@ -88,12 +86,11 @@ def register(request):
     return render_to_response("register.html", c)
 
 def home(request):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect('/login/?next=%s' % request.path)
     c = RequestContext(request, {'request': request})
     return render_to_response('home.html', c)
     
-def talks(request):
-    return render_to_response("home.html")
-
 def testRender(request):
     return render_to_response('one_img_post.html')
 
@@ -147,12 +144,12 @@ def renderPost(recipient, post):
     template = None
     inputs = {'post' : post, 'recipent' : recipient, 'is_author' : is_author}
 
-    if recipient in post.likes.all():
+    if recipient in post.likes:
         inputs['liked'] = 1
     else:
         inputs['liked'] = 0
 
-    inputs['likes'] = len(post.likes.all())
+    inputs['likes'] = len(post.likes)
 
     if len(pictures) > 1:
         template = 'two_img_post.html'
@@ -181,23 +178,8 @@ def renderPost(recipient, post):
     
 
 def renderComment(recipient, comment):
-    hdr = SmtpApiHeader.SmtpApiHeader()
-    hdr.setCategory("initial")  
-    replyToEmail = "p" + str(comment.post.id) + "c" + str(comment.id) + "@emailr.co"
-    
-    fromEmail =  "info@emailr.co"
-    toEmail = recipient.email.strip()
-
-    is_author = recipient == comment.author
-
-    template = None
-    inputs = {'comment' : comment, 'recipent' : recipient, 'is_author' : is_author}
-
-    html = render_to_string(template, inputs);
-    
-    msg = EmailMultiAlternatives(subject, text_content, fromEmail, [toEmail], headers={"Reply-To" : replyToEmail, "X-SMTPAPI": hdr.asJSON()})
-    msg.attach_alternative(html, "text/html")
-    msg.send()
+    #Check if recipent = comment.author
+    pass
 
 @require_POST
 @csrf_exempt 
@@ -237,23 +219,19 @@ def receiveEmail(request):
     email = Email(**output)
     email.save()
 
-    for i in range(1,int(attachments)+1):
+    for i in range(1,int(attachments)
+        +1):
         attachment = request.FILES['attachment%d' % i]
         #Use filepicker.io file = attachment.read()
         link = None
         email.attachments.create(link=link)
-    sender_email = re.findall('(([^, ]+)(\s*,\s*)?)', email.sender)
-    first_last = email.sender.split(" ")
-    first_name = None
-    last_name = None
-    if "@" not in first_last[0]:
-        if "," not in first_last[0]:
-            first_name = first_last[0]
-        else:
-            last_name = first_last[0]
-        if len(first_last) > 2 and "@" not in first_last[1]:
-            if last_name:
-                first_name = first_last[1]
+
+    try:
+        if "info" in email.to:
+            #This is for a new post
+            ccs_string = email.text.split('\n')[0]
+            if "r#" in ccs_string:
+                ccs_string = ccs_string.replace("r#", "")
             else:
                 last_name = first_last[1]
 
@@ -359,6 +337,7 @@ def generatePost(email, sender, recipients):
     post.recipients = recipients
     post.subject = email.subject
 
+    post.text = email.text
     #lines = email.text.split("\n")
     lines = re.split(r'[\n\r]+', email.text)
     for line in lines:
