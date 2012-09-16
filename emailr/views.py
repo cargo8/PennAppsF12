@@ -5,6 +5,7 @@ from django.shortcuts import render_to_response, redirect
 from django.views.generic.simple import direct_to_template
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate
+from django.contrib import auth
 import SmtpApiHeader
 import json
 import re
@@ -19,6 +20,8 @@ from django.views.decorators.csrf import csrf_exempt
 #######################################################
 
 def index(request):
+    if request.user.is_authenticated:
+        return redirect(home)
     if request.method == 'POST':
         form = TryItForm(request.POST)
         if form.is_valid():
@@ -27,14 +30,18 @@ def index(request):
             return render_to_response('index.html', {'form': form})
     else:
         form = TryItForm()
-    return render_to_response('index.html', {'form': form})
+    return render_to_response('index.html', {'form': form, 'request': request})
 
 def signup(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
             new_user = form.save()
-            return redirect(login)
+            u = User.objects.get_or_create(email = request.POST['username'])[0]
+            u.save()
+            u.auth = new_user
+            u.save()
+            return redirect(register)
     else:
         form = UserCreationForm()
 
@@ -45,19 +52,23 @@ def signup(request):
 def login(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
-        user = authenticate(username=form['email'], password=form['password'])
+        user = authenticate(username=request.POST['email'], password=request.POST['password'])
         if user is not None:
-            redirect(home)
+            auth.login(request, user)
+            return redirect(home)
         else:
-            render_to_response('login.html', {'form':form})
+            return redirect(index)
+            #render_to_response('login.html', {'form':form})
     else:
         form = LoginForm()
 
     c = RequestContext(request, {'form': form})
     return render_to_response("login.html", c)
 
+#TODO
 def home(request):
-    pass
+    c = RequestContext(request, {'request': request})    
+    return render_to_response('index.html', c)
     
 def talks(request):
     return render_to_response("talks.html")
@@ -75,11 +86,11 @@ def renderPost(recipient, post):
 
     # Specify that this is an initial contact message
     hdr.setCategory("initial")  
-    replyToEmail = "p" + str(comment.post.id) + "@emailr.co"
+    replyToEmail = "p" + str(post.id) + "@emailr.co"
     hdr.setReplyTo(replyToEmail)
-
+    print hdr
     fromEmail =  "info@emailr.co"
-    toEmail = recipent.email
+    toEmail = recipient.email
 
     # text is your plain-text email
     # html is your html version of the email
@@ -88,9 +99,10 @@ def renderPost(recipient, post):
 
     subject = post.subject
     
-    is_author = recipent == post.author
+    is_author = recipient == post.author
 
-    name =  post.author.first_name + " " + post.author.last_name
+    name =  "I dont like names" #post.author.first_name + " " + post.author.last_name
+
     text_content = name + " has shared something with you using Emailr:\n\n" + post.text
     text_content += "\n\n\nIf you would like to comment on this post just reply to this email."
 
@@ -98,7 +110,7 @@ def renderPost(recipient, post):
     links = []
     files = []
 
-    for attachment in post.attachments:
+    for attachment in post.content.all():
         if attachment.link_type == attachment.PICTURE:
             pictures.append(attachment)
         elif attachment.link_type == attachment.WEBSITE:
@@ -107,7 +119,8 @@ def renderPost(recipient, post):
             files.append(attachment)
 
     template = None
-    inputs = {'post' : post, 'recipent' : recipent, 'is_author' : is_author}
+    inputs = {'post' : post, 'recipent' : recipient, 'is_author' : is_author}
+
     if len(pictures) > 1:
         template = 'two_img_post.html'
         inputs['img1'] = pictures[0]
@@ -127,17 +140,14 @@ def renderPost(recipient, post):
         template = 'text_post.html'
         inputs['other_attachments'] = files
 
+    try:
+        html = render_to_string(template, inputs);
 
-        #
-
-    html = render_to_string(template, inputs);
-
-    msg = EmailMultiAlternatives(subject, text_content, fromEmail, [toEmail], headers={"X-SMTPAPI": hdr.asJSON()})
-    msg.attach_alternative(html, "text/html")
-    #msg.send()
-
-    c = RequestContext(request, inputs)
-    return render_to_response(template, c)
+        msg = EmailMultiAlternatives(subject, text_content, fromEmail, [toEmail], headers={"X-SMTPAPI": hdr.asJSON()})
+        msg.attach_alternative(html, "text/html")
+        msg.send()
+    except Exception as e:
+        print e
 
 def renderComment(recipient, comment):
     #Check if recipent = comment.author
@@ -149,8 +159,8 @@ def receiveEmail(request):
     output = {}
 
     data = request.POST
-    print data
-    
+    for key in data.keys():
+        print key
     attachments = 0
 
     if 'from' in data.keys():
@@ -180,11 +190,11 @@ def receiveEmail(request):
     if 'subject' in data.keys():
         output['subject'] = data['subject']
 
-
     email = Email(**output)
     email.save()
 
-    for i in range(1,attachments+1):
+    for i in range(1,int(attachments)
+        +1):
         attachment = request.FILES['attachment%d' % i]
         #Use filepicker.io file = attachment.read()
         link = None
@@ -195,10 +205,12 @@ def receiveEmail(request):
     ccs_string = email.text.split('\n')[0]
     if "r#" in ccs_string:
         ccs_string = ccs_string.replace("r#", "")
-    sender = User.objects.get_or_create(email = email)[0]
+    else:
+        ccs_string = None
+
+    sender = User.objects.get_or_create(email = email.sender)[0]
     contacts = parseContacts(sender , ccs_string)
     post = generatePost(email, sender, contacts)
-    
     renderPost(sender, post)
     for contact in contacts:
         renderPost(contact, post)
@@ -236,6 +248,8 @@ def parseContacts(user, ccs_string):
 ##                    break
 ##                c_lname += contact_user[i] + " "
 ##            c_lname = c_lname.strip()
+    if ccs_string is None:
+        return None
     contacts = re.findall('(([^, ]+)(\s*,\s*)?)', ccs_string)
     recipients = []
 
@@ -243,17 +257,12 @@ def parseContacts(user, ccs_string):
         c_email = contact[1]
            
         # find or create user from parsed info 
-        contact_user = user.contacts.get_or_create(email = c_email.lower())[0]
+        
+        contact_user = user.friends.get_or_create(email = c_email)[0]
         contact_user.save()
         
         # add parsed user to recipient list
         recipients.append(contact_user)
-
-        # add new contact user to sender's contacts
-        contact = user.contacts.get_or_create(user = contact_user)[0]
-
-        contact.save()
-
     return recipients
 
 # generates a post out of the email and its recipients
