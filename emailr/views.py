@@ -259,11 +259,6 @@ def parseContacts(user, ccs_string):
         
         # add parsed user to recipient list
         recipients.append(contact_user)
-
-        # add new contact user to sender's contacts
-        contact = user.friends.get_or_create(user = contact_user)[0]
-
-        contact.save()
     return recipients
 
 # generates a post out of the email and its recipients
