@@ -216,10 +216,11 @@ def receiveEmail(request):
         output['html'] = data['html']
     if 'subject' in data.keys():
         output['subject'] = data['subject']
-
-    email = Email(**output)
-    email.save()
+    print 1
     try:
+        email = Email(**output)
+        email.save()
+    
         for i in range(1,int(attachments)+1):
             attachment = request.FILES['attachment%d' % i]
             #Use filepicker.io file = attachment.read()
@@ -227,7 +228,7 @@ def receiveEmail(request):
         email.attachments.create(link=link)
     except Exception as e:
         print e.message
-    return HttpResponse()
+    print 2
     if "info" in email.to:
         #This is for a new post
         ccs_string = email.text.split('\n')[0]
