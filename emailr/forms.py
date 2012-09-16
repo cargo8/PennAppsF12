@@ -12,3 +12,7 @@ class EmailForm(forms.ModelForm):
     class Meta:
         model = Email
         exclude = 'attachments'
+
+class LoginForm(forms.Form):
+    email = forms.EmailField()
+    password = forms.CharField(widget=forms.PasswordInput)

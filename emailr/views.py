@@ -3,6 +3,8 @@ from django.template import Context, RequestContext, TemplateDoesNotExist
 from django.template.loader import render_to_string
 from django.shortcuts import render_to_response, redirect
 from django.views.generic.simple import direct_to_template
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import authenticate
 import SmtpApiHeader
 import json
 import re
@@ -11,6 +13,10 @@ from emailr.models import *
 from django.views.decorators.http import require_POST
 from emailr.forms import *
 from django.views.decorators.csrf import csrf_exempt
+
+#######################################################
+###### WEB CLIENT VIEW CODE ###########################
+#######################################################
 
 def index(request):
     if request.method == 'POST':
@@ -24,18 +30,41 @@ def index(request):
     return render_to_response('index.html', {'form': form})
 
 def signup(request):
-    return render_to_response('signup.html')
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            new_user = form.save()
+            return redirect(login)
+    else:
+        form = UserCreationForm()
 
+    c = RequestContext(request, {'form': form})
+
+    return render_to_response("signup.html", c)
+    
 def login(request):
-    return render_to_response('login.html')
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        user = authenticate(username=form['email'], password=form['password'])
+        if user is not None:
+            redirect(home)
+        else:
+            render_to_response('login.html', {'form':form})
+    else:
+        form = LoginForm()
 
-def renderComment(recipient, comment):
-    #Check if recipent = comment.author
+    c = RequestContext(request, {'form': form})
+    return render_to_response("login.html", c)
+
+def home(request):
     pass
 
 def testRender(request):
     return render_to_response('one_img_post.html')
 
+#######################################################
+###### BACKEND PROCESSING CODE ########################
+#######################################################
 
 def renderPost(recipient, post):
     #Check if recipent = post.author
@@ -107,6 +136,10 @@ def renderPost(recipient, post):
     c = RequestContext(request, inputs)
     return render_to_response(template, c)
 
+def renderComment(recipient, comment):
+    #Check if recipent = comment.author
+    pass
+
 @require_POST
 @csrf_exempt 
 def receiveEmail(request):
@@ -159,7 +192,7 @@ def receiveEmail(request):
     ccs_string = email.text.split('\n')[0]
     if "r#" in ccs_string:
         ccs_string = ccs_string.replace("r#", "")
-    sender = User.objects.get_or_create(email = email)
+    sender = User.objects.get_or_create(email = email)[0]
     contacts = parseContacts(sender , ccs_string)
     post = generatePost(email, sender, contacts)
     
@@ -207,14 +240,15 @@ def parseContacts(user, ccs_string):
         c_email = contact[1]
            
         # find or create user from parsed info 
-        contact_user = User.objects.get_or_create(email = c_email.lower())[0]
+        contact_user = user.contacts.get_or_create(email = c_email.lower())[0]
         contact_user.save()
         
         # add parsed user to recipient list
         recipients.append(contact_user)
 
         # add new contact user to sender's contacts
-        contact = user.instance.contacts.get_or_create(user = contact_user)
+        contact = user.contacts.get_or_create(user = contact_user)[0]
+
         contact.save()
 
     return recipients
@@ -223,6 +257,7 @@ def parseContacts(user, ccs_string):
 def generatePost(email, sender, recipients):
     post = Post()
     post.author = sender
+    post.save()
     post.recipients = recipients
     post.subject = email.subject
 
@@ -234,17 +269,15 @@ def generatePost(email, sender, recipients):
         post.text += line
 
     # extract images/links from Attachments
-    for att in email.attachments:
+    for att in email.attachments.all():
       link = att.link
       ext = link.split(".")[-1].lower()
       cnt = Content()
+      cnt.link = link
       if ext in ["jpg", "png", "gif"]:
-        cnt.link = None
-        cnt.picture = link
+        cnt.link_type = cnt.PICTURE
       else:
-        cnt.link = link
-        cnt.picture = None
-      post.instance.content.add(cnt)
-
-    post.likes = 0
+        cnt.link_type = cnt.FILE
+      post.content.add(cnt)
+    post.save()
     return post
