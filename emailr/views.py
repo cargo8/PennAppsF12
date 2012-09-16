@@ -207,7 +207,8 @@ def parseContacts(user, ccs_string):
         c_email = contact[1]
            
         # find or create user from parsed info 
-        contact_user = User.objects.get_or_create(email = c_email.lower())[0]
+        contact_user = user.instance.contacts.get_or_create(email = c_email.lower())[0]
+        contact_user.email_preferences.get_or_create() #Creates preferences if they dont exist
         contact_user.save()
         
         # add parsed user to recipient list
@@ -215,6 +216,7 @@ def parseContacts(user, ccs_string):
 
         # add new contact user to sender's contacts
         contact = user.instance.contacts.get_or_create(user = contact_user)
+
         contact.save()
 
     return recipients
