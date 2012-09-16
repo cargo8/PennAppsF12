@@ -15,7 +15,7 @@ urlpatterns = patterns('',
     url(r'^signup/$', signup),
     url(r'^login/$', login),
     url(r'^receiveEmail/$', receiveEmail),
-    url(r'^talks/$', talks),
+    url(r'^talks/*', talks),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),

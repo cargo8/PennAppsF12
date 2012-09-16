@@ -4,7 +4,71 @@
 
 {% block content %}
 <div class="hero-unit" style="background-color: whiteSmoke;" >
-  <h3>Talks</h3>
+
+    <div class="container-fluid">
+      <div class="row-fluid">
+         <div class="span4">
+            <form class="form-search">
+               <input type="text" class="input-medium search-query">
+               <button type="submit" class="btn">Search</button>
+            </form>
+             <ul class="nav nav-list">
+               <li class="nav-header">Talks</li>
+               <li id="jason" class="inactive"><a href="javascript:void(0)">
+                  <table>
+                     <tr>
+                        <td width="90%">Jason Mow</td>
+                        <td><img src="https://fbcdn-profile-a.akamaihd.net/hprofile-ak-prn1/48782_1063440122_737511809_q.jpg" /></td>
+                     </tr>
+                  </table>
+               </a></li>
+               <li id="joshua" class="inactive"><a href="javascript:void(0)">
+                  <table>
+                     <tr>
+                        <td width="90%">Joshua Wilson</td>
+                        <td><img src="https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash4/195340_1307190045_861856258_q.jpg" /></td>
+                     </tr>
+                  </table>
+               </a></li>
+               <li id="gary" class="inactive"><a href="javascript:void(0)">
+                  <table>
+                     <tr>
+                        <td width="90%">Gary Menezes</td>
+                        <td><img src="https://fbcdn-profile-a.akamaihd.net/hprofile-ak-prn1/49550_1526515316_4063_q.jpg" /></td>
+                     </tr>
+                  </table>
+               </a></li>
+               <li id="stefan" class="inactive"><a href="javascript:void(0)">
+                  <table>
+                     <tr>
+                        <td width="90%">Stefan Zhelyazkov</td>
+                        <td><img src="https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash4/186355_693468495_1222752505_q.jpg" /></td>
+                     </tr>
+                  </table>
+               </a></li>
+             </ul>
+         </div>
+         
+         <div class="span8">
+         <ul class="nav nav-list">
+               <li class="nav-header"><h3>Chronology</h3></li>
+               <li class="active"><a href="#">Home</a></li>
+               <li><a href="#">Library</a></li>          
+             </ul>
+         </div>
+      </div>
+    </div>
+
+
+   <script>
+      $(document).ready(function() {
+         $('.inactive').click(function() {
+            $(".active").removeClass("active").addClass("inactive");
+            $("#"+this.id).removeClass("inactive").addClass("active");
+         });
+         
+      });
+   </script>
 </div>
       
 {% endblock %}
