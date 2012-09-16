@@ -90,7 +90,7 @@ def renderPost(recipient, post):
     hdr.setReplyTo(replyToEmail)
     print hdr
     fromEmail =  "info@emailr.co"
-    toEmail = recipient.email
+    toEmail = recipient.email.trim()
 
     # text is your plain-text email
     # html is your html version of the email
