@@ -1,0 +1,53 @@
+{% extends 'email_base.html' %}
+
+{% block preview %}
+{{ post.author.first_name }} {{ post.author.last_name }} has shared something with you using Emailr. Join Emailr to turn emails into conversations.
+{% endblock %}
+
+{% block content %}
+                                	<table border="0" cellpadding="0" cellspacing="0" width="600" id="templateBody">
+                                 <!-- // Begin Template Body \\ -->
+                                	<table border="0" cellpadding="0" cellspacing="0" width="600" id="templateBody">
+                                    <tr>
+                                 <h3 style="border-top:1px solid #D1D1D1; padding-top: 15px;">{{ post.author.first_name }} {{ post.author.last_name }} shared photos with you</h3>
+                                       <td valign="top" width="300" class="leftColumnContent">
+                                            
+                                          <!-- // Begin Module: Top Image with Content \\ -->
+                                          <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                             <tr mc:repeatable>
+                                                <td valign="top">
+                                                   <img src="http://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Bachalpseeflowers.jpg/300px-Bachalpseeflowers.jpg" class="twoPic" />
+                                                </td>
+                                             </tr>
+                                          </table>
+                                          <!-- // End Module: Top Image with Content \\ -->
+                                          
+                                       </td>
+                                       <td>
+                                          <!-- spacer -->
+                                          <div style="width:20px;"></div>
+                                       </td>
+                                       <td valign="top" width="300" class="rightColumnContent">
+                                         
+                                          <!-- // Begin Module: Top Image with Content \\ -->
+                                          <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                             <tr mc:repeatable>
+                                                <td valign="top">
+                                                   <img src="http://www.naturewallpaper.co.uk/wallpapers/nature-wallpaper-90.jpg" class="twoPic" />
+                                                </td>
+                                             </tr>
+                                          </table>
+                                          <!-- // End Module: Top Image with Content \\ -->
+                                         
+                                       </td>
+                                    </tr>
+                                    <tr>
+                                       <td colspan="3" valign="top" class="bodyContent">
+                                          <div>
+                                          <span class="twoPicsCaption">It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.</span>
+                                          <span class="date">Sept 15th 2012 12:04 pm</span>
+                                          </div>
+                                       </td>
+                                    </tr>
+                                	</table>
+{% endblock %}
