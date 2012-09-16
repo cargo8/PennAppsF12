@@ -45,7 +45,7 @@ def signup(request):
     else:
         form = UserCreationForm()
 
-    c = RequestContext(request, {'form': form})
+    c = RequestContext(request, {'request': request, 'form': form})
 
     return render_to_response("signup.html", c)
     
@@ -62,20 +62,38 @@ def login(request):
     else:
         form = LoginForm()
 
-    c = RequestContext(request, {'form': form})
+    c = RequestContext(request, {'request':request, 'form': form})
     return render_to_response("login.html", c)
 
 def logout(request):
     auth.logout(request)
     form = TryItForm()
-    return render_to_response('index.html', {'form': form, 'msg': 'You have successfully logged out.'})
+    return render_to_response('index.html', {'request': request, 'form': form, 'msg': 'You have successfully logged out.'})
+
+def register(request):
+    if request.method == 'POST':
+        form = ProfileForm(request.POST)
+        if form.is_valid():
+            user = User.objects.get_or_create(email = request.POST['email'])[0]
+            user.first_name = request.POST['first_name']
+            user.last_name = request.POST['last_name']
+            user.save()
+
+            user.activated = True
+            user.save()
+            return render_to_response("index.html", {'request':request})
+    else:
+        form = ProfileForm()
+        
+    c = RequestContext(request, {'request':request, 'form': form})
+    return render_to_response("register.html", c)
 
 def home(request):
     c = RequestContext(request, {'request': request})
-    return render_to_response('index.html', c)
+    return render_to_response('home.html', c)
     
 def talks(request):
-    return render_to_response("talks.html")
+    return render_to_response("home.html")
 
 def testRender(request):
     return render_to_response('one_img_post.html')
@@ -129,6 +147,13 @@ def renderPost(recipient, post):
 
     template = None
     inputs = {'post' : post, 'recipent' : recipient, 'is_author' : is_author}
+
+    if recipient in post.likes:
+        inputs['liked'] = 1
+    else:
+        inputs['liked'] = 0
+
+    inputs['likes'] = len(post.likes)
 
     if len(pictures) > 1:
         template = 'two_img_post.html'

@@ -13,7 +13,7 @@
 	  	{{ form.email.errors }}
 	    <label class="control-label" for="email">Email:</label>
 	    <div class="controls">
-	      {{form.email }}
+	      <input type="text" name="email" id="id_email" value="{{ request.user.email }}" />
 	    </div>
 	  </div>
 
