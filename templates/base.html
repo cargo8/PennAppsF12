@@ -53,8 +53,12 @@
 	<div class="container">
     <a class="brand" href="/"><img src="/static/logo-no-bg.png" style="max-height: 50px;"></img></a>    
     <ul class="pull-right nav">
+    		{% if request.user %}
+    		<li><a href="/logout/" style="padding-top:25px;"><strong>Logout</strong></a></li>
+    		{% else %}
 			<li><a href="/login/" style="padding-top:25px;"><strong>Login</strong></a></li>
-
+			<li><a href="/signup/" style="padding-top:25px;"><strong>Sign Up</strong></a></li>
+			{% endif %}
     </ul> 
     </div>
   </div>
