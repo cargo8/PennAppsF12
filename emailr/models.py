@@ -21,6 +21,11 @@ class User(models.Model):
 	email_preferences = models.OneToOneField(EmailPreferences)
 	activated = models.BooleanField(default=False)
 
+	def save(self, force_insert=False, force_update=False):
+        if email_preferences is None:
+        	email_preferences = EmailPreferences()
+        super(User, self).save()
+
 class MailingListGroup(models.Model):
 	owner = models.ForeignKey(User, related_name='mailing_list_owner')
 	members = models.ManyToManyField(User, related_name='mailing_list_members')
