@@ -114,8 +114,6 @@ def receiveEmail(request):
         print key
     attachments = 0
 
-    print data[u'from']
-
     if 'from' in data.keys():
         if type(data['from']) is list:
             output['sender'] = "; ".join(data['from'])
@@ -143,7 +141,7 @@ def receiveEmail(request):
     if 'subject' in data.keys():
         output['subject'] = data['subject']
 
-
+    print output
     email = Email(**output)
     email.save()
 
