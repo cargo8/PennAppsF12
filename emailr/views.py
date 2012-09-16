@@ -96,7 +96,7 @@ def renderPost(recipient, post):
         inputs['other_attachments'] = files
 
 
-        #
+    print toEmail
 
     html = render_to_string(template, inputs);
 
@@ -110,8 +110,6 @@ def receiveEmail(request):
     output = {}
 
     data = request.POST
-    print data
-    
     attachments = 0
 
     if 'from' in data.keys():
