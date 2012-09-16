@@ -320,6 +320,9 @@ def receiveEmail(request):
             for line in email.text.split('\n'):
                 if '>' not in line[:2]:
                     comment_text += line
+            cut = comment_text.find("On Sun")
+            if cut > 0:
+                comment_text = comment_text[:cut]
             comment = Comment.objects.create(author = sender, text = comment_text, post = post)
             comment.save()
             if len(content) > 0:
