@@ -101,7 +101,8 @@ def renderPost(recipient, post):
     
     is_author = recipient == post.author
 
-    name =  post.author.first_name + " " + post.author.last_name
+    name =  "I dont like names" #post.author.first_name + " " + post.author.last_name
+
     text_content = name + " has shared something with you using Emailr:\n\n" + post.text
     text_content += "\n\n\nIf you would like to comment on this post just reply to this email."
 
@@ -207,17 +208,11 @@ def receiveEmail(request):
         ccs_string = None
 
     sender = User.objects.get_or_create(email = email.sender)[0]
-    print ccs_string
-    try:
-        contacts = parseContacts(sender , ccs_string)
-        print contacts
-        post = generatePost(email, sender, contacts)
-        print post
-        renderPost(sender, post)
-        for contact in contacts:
-            renderPost(contact, post)
-    except Exception as e:
-            print e.value
+    contacts = parseContacts(sender , ccs_string)
+    post = generatePost(email, sender, contacts)
+    renderPost(sender, post)
+    for contact in contacts:
+        renderPost(contact, post)
     ##
 
     #Comment
