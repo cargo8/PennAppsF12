@@ -7,11 +7,27 @@
   <h1>Sign up for Emailr</h1>
   <p>Begin your social email experience today.</p>
   <p>
-    <form class="form-horizontal">
+    <form class="form-horizontal" action="." method="post">
+    {% csrf_token %}
 	  <div class="control-group">
-	    <label class="control-label" for="inputEmail">Email</label>
+	    <label class="control-label" for="id_username">Email:</label>
 	    <div class="controls">
-	      <input type="text" id="inputEmail" placeholder="Email">
+	      {{form.username }}
+	    </div>
+	  </div>
+
+	  <div class="control-group">
+	    <label class="control-label" for="id_password1">Password:</label>
+	    <div class="controls">
+	      {{ form.password1 }}
+	    </div>
+	  </div>
+	  
+	  <div class="control-group">
+	    <label class="control-label" for="id_password2">Password confirmation:</label>
+	    <div class="controls">
+	      {{ form.password2 }}
+	      <br/><small>Enter the same password as above, for verification.</small>
 	    </div>
 	  </div>
 

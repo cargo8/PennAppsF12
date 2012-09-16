@@ -3,6 +3,7 @@ from django.template import Context, RequestContext, TemplateDoesNotExist
 from django.template.loader import render_to_string
 from django.shortcuts import render_to_response, redirect
 from django.views.generic.simple import direct_to_template
+from django.contrib.auth.forms import UserCreationForm
 import SmtpApiHeader
 import json
 import re
@@ -11,6 +12,10 @@ from emailr.models import *
 from django.views.decorators.http import require_POST
 from emailr.forms import *
 from django.views.decorators.csrf import csrf_exempt
+
+#######################################################
+###### WEB CLIENT VIEW CODE ###########################
+#######################################################
 
 def index(request):
     if request.method == 'POST':
@@ -24,17 +29,31 @@ def index(request):
     return render_to_response('index.html', {'form': form})
 
 def signup(request):
-    return render_to_response('signup.html')
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            new_user = form.save()
+            return redirect(login)
+    else:
+        form = UserCreationForm()
 
+    c = RequestContext(request, {'form': form})
+
+    return render_to_response("signup.html", c)
+    
 def login(request):
     return render_to_response('login.html')
 
-def renderComment(recipient, comment):
-    #Check if recipent = comment.author
+def home(request):
     pass
 
 def testRender(request):
-    pass
+    return render_to_response('one_img_post.html')
+
+#######################################################
+###### BACKEND PROCESSING CODE ########################
+#######################################################
+>>>>>>> 2bd461041701e81f1f14d85e49d5a29adabd4efb
 
 def renderPost(recipient, post):
     #Check if recipent = post.author
@@ -76,22 +95,22 @@ def renderPost(recipient, post):
     template = None
     inputs = {'post' : post, 'recipent' : recipent, 'is_author' : is_author}
     if len(pictures) > 1:
-        template = 'two-img-post.html'
+        template = 'two_img_post.html'
         inputs['img1'] = pictures[0]
         inputs['img2'] = pictures[1]
         inputs['other_attachments'] = pictures[2:] + links + files
     elif len(pictures) == 1:
-        template = 'one-img-post.html'
+        template = 'one_img_post.html'
         inputs['img1'] = pictures[0]
         inputs['other_attachments'] = links + files
     elif len(links) > 0:
-        template = 'link-post.html'
+        template = 'link_post.html'
         if len(links) > 1:
             inputs['other_attachments'] = links[1:] + files
         else:
             inputs['other_attachments'] = files
     else:
-        template = 'text-post.html'
+        template = 'text_post.html'
         inputs['other_attachments'] = files
 
 
@@ -105,6 +124,10 @@ def renderPost(recipient, post):
 
     c = RequestContext(request, inputs)
     return render_to_response(template, c)
+
+def renderComment(recipient, comment):
+    #Check if recipent = comment.author
+    pass
 
 @require_POST
 @csrf_exempt 
@@ -158,7 +181,7 @@ def receiveEmail(request):
     ccs_string = email.text.split('\n')[0]
     if "r#" in ccs_string:
         ccs_string = ccs_string.replace("r#", "")
-    sender = User.objects.get_or_create(email = email.lower())
+    sender = User.objects.get_or_create(email = email)[0]
     contacts = parseContacts(sender , ccs_string)
     post = generatePost(email, sender, contacts)
     
@@ -186,30 +209,36 @@ def receiveEmail(request):
 #@returns : all recipients
 
 def parseContacts(user, ccs_string):
-    contacts = re.findall('([a-zA-Z]+)(\s[a-zA-Z]+)?\s+<(([^<>,;"]+|".+")+)>(,\s+)?', ccs_string)
+##    contacts = re.findall('([a-zA-Z]+)(\s[a-zA-Z]+)?\s+<(([^<>,;"]+|".+")+)>(,\s+)?', ccs_string)
+##    recipients = []
+##
+##    for contact in contacts:
+##        for i in range(len(contact)):
+##            c_fname = contact_user[0]
+##            c_lname = c_email = ""
+##            for i in range(1, len(contact_user)):
+##                if "@" in contact_user[i]:
+##                    c_email = contact_user[i]
+##                    break
+##                c_lname += contact_user[i] + " "
+##            c_lname = c_lname.strip()
+    contacts = re.findall('(([^, ]+)(\s*,\s*)?)', ccs_string)
     recipients = []
 
     for contact in contacts:
-        for i in range(len(contact)):
-            c_fname = contact_user[0]
-            c_lname = c_email = ""
-            for i in range(1, len(contact_user)):
-                if "@" in contact_user[i]:
-                    c_email = contact_user[i]
-                    break
-                c_lname += contact_user[i] + " "
-            c_lname = c_lname.strip()
+        c_email = contact[1]
            
-            # find or create user from parsed info 
-            contact_user = User.objects.get_or_create(email = c_email.lower(), first_name = c_fname, last_name = c_lname)[0]
-            contact_user.save()
-            
-            # add parsed user to recipient list
-            recipients.append(contact_user)
+        # find or create user from parsed info 
+        contact_user = user.contacts.get_or_create(email = c_email.lower())[0]
+        contact_user.save()
+        
+        # add parsed user to recipient list
+        recipients.append(contact_user)
 
-            # add new contact user to sender's contacts
-            contact = user.instance.contacts.get_or_create(user = contact_user)
-            contact.save()
+        # add new contact user to sender's contacts
+        contact = user.contacts.get_or_create(user = contact_user)[0]
+
+        contact.save()
 
     return recipients
 
@@ -217,6 +246,7 @@ def parseContacts(user, ccs_string):
 def generatePost(email, sender, recipients):
     post = Post()
     post.author = sender
+    post.save()
     post.recipients = recipients
     post.subject = email.subject
 
@@ -228,17 +258,15 @@ def generatePost(email, sender, recipients):
         post.text += line
 
     # extract images/links from Attachments
-    for att in email.attachments:
+    for att in email.attachments.all():
       link = att.link
       ext = link.split(".")[-1].lower()
       cnt = Content()
+      cnt.link = link
       if ext in ["jpg", "png", "gif"]:
-        cnt.link = None
-        cnt.picture = link
+        cnt.link_type = cnt.PICTURE
       else:
-        cnt.link = link
-        cnt.picture = None
-      post.instance.content.add(cnt)
-
-    post.likes = 0
+        cnt.link_type = cnt.FILE
+      post.content.add(cnt)
+    post.save()
     return post
