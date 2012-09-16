@@ -386,6 +386,7 @@ def generatePost(email, sender, recipients):
       cnt = Content()
       cnt.link = link
       cnt.link_type = cnt.PICTURE
+      cnt.save()
       post.content.add(cnt)
     #post.content.add = content
     post.save()
