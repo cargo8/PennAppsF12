@@ -269,14 +269,14 @@ def receiveEmail(request):
         last_name = None
         if "@" not in first_last[0]:
             if "," not in first_last[0]:
-                first_name = first_last[0]
+                first_name = first_last[0].replace('"', '')
             else:
-                last_name = first_last[0]
+                last_name = first_last[0].replace('"', '')
             if len(first_last) > 2 and "@" not in first_last[1]:
                 if last_name:
-                    first_name = first_last[1]
+                    first_name = first_last[1].replace('"', '')
                 else:
-                    last_name = first_last[1]
+                    last_name = first_last[1].replace('"', '')
         sender = User.objects.get_or_create(email = sender_email[0][1])[0]
         if not sender.first_name:
             sender.first_name = first_name
