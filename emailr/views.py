@@ -372,8 +372,8 @@ def generatePost(email, sender, recipients):
     #lines = email.text.split("\n")
     lines = re.split(r'[\n\r]+', email.text)
     for line in lines:
-      if not "r#" in line and if not ">" in line[:2]:
-        post.text += line
+        if not "r#" in line and not ">" in line[:2]:
+            post.text += line
 
     # extract images/links from Attachments
     content = []
@@ -382,11 +382,8 @@ def generatePost(email, sender, recipients):
       ext = link.split(".")[-1].lower()
       cnt = Content()
       cnt.link = link
-      if ext in ["jpg", "png", "gif"]:
-        cnt.link_type = cnt.PICTURE
-      else:
-        cnt.link_type = cnt.FILE
-      content.add(cnt)
+      cnt.link_type = cnt.PICTURE
+      content.append(cnt)
     post.content = content
     post.save()
     return post
