@@ -80,20 +80,40 @@ def renderEmail(request):
 @require_POST
 @csrf_exempt 
 def receiveEmail(request):
-    email_form = {}
-    for key in request.POST.keys():
-        email_form[key] = str(request.POST[key])
-    form = EmailForm(email_form)
+    output = {}
 
-    if form.is_valid():
-        email = form.save()
-        for i in range(1,form.cleaned_data['attachments']+1):
+    data = request.POST
+    attachments = 0
+
+    if data['from']:
+        output['sender'] = "; ".join(data['from'])
+    if data['attachments']:
+        attachments = data['attachments']
+        if type(attachments) is list:
+            attachments = attachments[0]
+
+    if data['to']:
+        output['to'] = "; ".join(data['to'])
+    if data['text']:
+        output['text'] = data['text']
+
+    if data['headers']:
+        output['headers'] = data['headers']
+    if data['html']:
+        output['html'] = data['html']
+    if data['subject']:
+        output['subject'] = data['subject']
+
+    print output
+    email = Email(output)
+    email.save()
+    for i in range(1,attachments+1):
             attachment = request.FILES['attachment%d' % i]
             #Use filepicker.io file = attachment.read()
             link = None
             email.attachments.create(link=link)
     else:
-        print "FUCK THIS"
+            print "FUCK THIS"
     contacts = None #parseContacts(None, None)
     #post = generatePost(email, contacts)
     return HttpResponse()

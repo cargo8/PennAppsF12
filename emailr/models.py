@@ -69,12 +69,6 @@ class Email(models.Model):
     to = models.TextField()
     cc = models.TextField()
     subject = models.TextField()
-    dkim = models.TextField()
-    SPF = models.TextField()
-    envelope = models.TextField()
-    charsets = models.CharField(max_length=255)
-    spam_score = models.FloatField()
-    spam_report = models.TextField()
     attachments = models.ManyToManyField(Attachment)
     timestamp = models.DateTimeField(auto_now_add=True)
 
