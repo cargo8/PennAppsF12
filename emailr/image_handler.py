@@ -6,8 +6,12 @@ import random
 
 def save_image(instream):
 	conn = S3Connection()
-	bucket = conn.lookup('emailr_file_storage')
-	key(bucket)
+	print "Before 1"
+	bucket = conn.get_all_buckets()[0]
+	print "After 1"
+	k = Key(bucket)
 	k.key = str(time.localtime()) + str(random.randint(0,5000))
-	key.send_file(instream)
-	return key.generate_url(100000000)
+	print "After 1]2"
+	k.set_contents_from_string(instream.read())
+	print "Before return  1"
+	return k.generate_url(100000000)
