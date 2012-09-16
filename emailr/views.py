@@ -196,7 +196,9 @@ def receiveEmail(request):
         else:
             output['sender'] = data['from']
     if 'attachments' in data.keys():
+        print 1
         attachments = data['attachments']
+        print attachments
         if type(attachments) is list:
             attachments = attachments[0]
 
