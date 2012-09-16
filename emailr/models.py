@@ -16,7 +16,7 @@ class EmailPreferences(models.Model):
 	digest_timeframe_days = models.IntegerField(default=1)
 
 class User(models.Model):
-	friends = models.ManyToManyField(Contact)
+	friends = models.ManyToManyField(User)
 	email = models.EmailField()
 	profile_picture = models.URLField()
 	first_name = models.CharField(max_length=50)
