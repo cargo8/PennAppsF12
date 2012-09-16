@@ -31,8 +31,6 @@ def index(request):
     return render_to_response('index.html', {'form': form, 'request': request})
 
 def signup(request):
-    if request.user.is_authenticated:
-        return redirect(home)
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
@@ -67,7 +65,7 @@ def login(request):
 def logout(request):
     auth.logout(request)
     form = TryItForm()
-    return render_to_response('index.html', {'request': request, 'form': form, 'msg': 'You have successfully logged out.'})
+    return render_to_response('index.html', {'form': form, 'msg': 'You have successfully logged out.'})
 
 def register(request):
     if request.method == 'POST':
@@ -88,12 +86,11 @@ def register(request):
     return render_to_response("register.html", c)
 
 def home(request):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect('/login/?next=%s' % request.path)
     c = RequestContext(request, {'request': request})
     return render_to_response('home.html', c)
     
-def talks(request):
-    return render_to_response("home.html")
-
 def testRender(request):
     return render_to_response('one_img_post.html')
 
