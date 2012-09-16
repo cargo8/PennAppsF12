@@ -34,7 +34,7 @@ def renderComment(recipient, comment):
     pass
 
 def testRender(request):
-    return render_to_response('text_post.html')
+    return render_to_response('one_img_post.html')
 
 
 def renderPost(recipient, post):
