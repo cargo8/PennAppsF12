@@ -231,6 +231,7 @@ def receiveEmail(request):
         print 'a', e
         print e.message
         return HttpResponse()
+    print "past 2"
     if "info" in email.to:
         #This is for a new post
         ccs_string = email.text.split('\n')[0]
