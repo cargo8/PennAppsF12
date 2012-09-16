@@ -144,7 +144,7 @@ def receiveEmail(request):
     email = Email(**output)
     email.save()
 
-    for i in range(1,attachments+1):
+    for i in range(1,int(attachments)+1):
         attachment = request.FILES['attachment%d' % i]
         #Use filepicker.io file = attachment.read()
         link = None
