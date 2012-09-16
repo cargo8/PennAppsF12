@@ -109,10 +109,9 @@ def renderPost(recipient, post):
     # Specify that this is an initial contact message
     hdr.setCategory("initial")  
     replyToEmail = "p" + str(post.id) + "@emailr.co"
-    hdr.setReplyTo(replyToEmail)
-    print hdr
+    
     fromEmail =  "info@emailr.co"
-    toEmail = recipient.email
+    toEmail = recipient.email.strip()
 
     # text is your plain-text email
     # html is your html version of the email
@@ -123,7 +122,13 @@ def renderPost(recipient, post):
     
     is_author = recipient == post.author
 
-    name =  "I dont like names" #post.author.first_name + " " + post.author.last_name
+    name =  ""
+    if post.author.first_name:
+        name = post.author.first_name
+    if post.author.last_name:
+        name += post.author.last_name
+    if len(name) < 1:
+        name = post.author.email
 
     text_content = name + " has shared something with you using Emailr:\n\n" + post.text
     text_content += "\n\n\nIf you would like to comment on this post just reply to this email."
@@ -162,14 +167,12 @@ def renderPost(recipient, post):
         template = 'text_post.html'
         inputs['other_attachments'] = files
 
-    try:
-        html = render_to_string(template, inputs);
+    html = render_to_string(template, inputs);
 
-        msg = EmailMultiAlternatives(subject, text_content, fromEmail, [toEmail], headers={"X-SMTPAPI": hdr.asJSON()})
-        msg.attach_alternative(html, "text/html")
-        msg.send()
-    except Exception as e:
-        print e
+    msg = EmailMultiAlternatives(subject, text_content, fromEmail, [toEmail], headers={"Reply-To" : replyToEmail, "X-SMTPAPI": hdr.asJSON()})
+    msg.attach_alternative(html, "text/html")
+    msg.send()
+    
 
 def renderComment(recipient, comment):
     #Check if recipent = comment.author
@@ -181,8 +184,6 @@ def receiveEmail(request):
     output = {}
 
     data = request.POST
-    for key in data.keys():
-        print key
     attachments = 0
 
     if 'from' in data.keys():
@@ -222,28 +223,51 @@ def receiveEmail(request):
         link = None
         email.attachments.create(link=link)
 
-    #This is for a new post
-    ###########################################
-    ccs_string = email.text.split('\n')[0]
-    if "r#" in ccs_string:
-        ccs_string = ccs_string.replace("r#", "")
-    else:
-        ccs_string = None
+    try:
+        if "info" in email.to:
+            #This is for a new post
+            ccs_string = email.text.split('\n')[0]
+            if "r#" in ccs_string:
+                ccs_string = ccs_string.replace("r#", "")
+            else:
+                ccs_string = None
+            sender_email = re.findall('(([^, ]+)(\s*,\s*)?)', email.sender)
+            first_last = email.sender.split(" ")
+            first_name = None
+            last_name = None
+            if "@" not in first_last[0]:
+                if "," not in first_last[0]:
+                    first_name = first_last[0]
+                else:
+                    last_name = first_last[0]
+                if len(first_last) > 2 and "@" not in first_last[1]:
+                    if last_name:
+                        first_name = first_last[1]
+                    else:
+                        last_name = first_last[1]
 
-    sender = User.objects.get_or_create(email = email.sender)[0]
-    contacts = parseContacts(sender , ccs_string)
-    post = generatePost(email, sender, contacts)
-    renderPost(sender, post)
-    for contact in contacts:
-        renderPost(contact, post)
-    ##
-
-    #Comment
-    """
-    renderComment(sender, post)
-    for contact in contacts:
-        renderComment(contact, post)
-    """
+            sender = User.objects.get_or_create(email = sender_email[0][1])[0]
+            if not sender.first_name:
+                sender.first_name = first_name
+            if not sender.last_name:
+                sender.last_name = last_name
+            sender.save()
+            
+            contacts = parseContacts(sender , ccs_string)
+            post = generatePost(email, sender, contacts)
+                
+            renderPost(sender, post)
+            for contact in contacts:
+                renderPost(contact, post)
+        to_groups = re.match('P(\d+)', email.to)
+        if to_groups:
+            post = Post.objects.get(id = to_groups.group(1))
+            sender = User.objects.get_or_create(email = email.sender)[0]
+            contacts = post.recipients + post.author
+            for contact in contacts:
+                renderComment(contact, post)
+    except Exception as e:
+        print e.message
     return HttpResponse()
 
 # @params:
