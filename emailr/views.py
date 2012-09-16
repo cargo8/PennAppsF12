@@ -31,6 +31,10 @@ def login(request):
 
 def renderComment(recipient, comment):
     #Check if recipent = comment.author
+    pass
+
+def testRender(request):
+    pass
 
 def renderPost(recipient, post):
     #Check if recipent = post.author
@@ -62,9 +66,9 @@ def renderPost(recipient, post):
     files = []
 
     for attachment in post.attachments:
-        if attachment.link_type = attachment.PICTURE:
+        if attachment.link_type == attachment.PICTURE:
             pictures.append(attachment)
-        elif attachment.link_type = attachment.WEBSITE:
+        elif attachment.link_type == attachment.WEBSITE:
             links.append(attachment)
         else:
             files.append(attachment)
