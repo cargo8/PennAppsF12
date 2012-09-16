@@ -204,7 +204,7 @@ def renderComment(recipient, comment):
 
     html = render_to_string(template, inputs);
     
-    msg = EmailMultiAlternatives(comment.post.subject, text_content, fromEmail, [toEmail], headers={"Reply-To" : replyToEmail, "X-SMTPAPI": hdr.asJSON()})
+    msg = EmailMultiAlternatives(comment.post.subject, comment.text, fromEmail, [toEmail], headers={"Reply-To" : replyToEmail, "X-SMTPAPI": hdr.asJSON()})
     msg.attach_alternative(html, "text/html")
     msg.send()
 
