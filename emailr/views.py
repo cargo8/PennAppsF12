@@ -86,7 +86,10 @@ def receiveEmail(request):
     attachments = 0
 
     if 'from' in data.keys():
-        output['sender'] = "; ".join(data['from'])
+        if type(data['sender']) is list:
+            output['sender'] = "; ".join(data['from'])
+        else:
+            output['sender'] = data['from']
     if 'attachments' in data.keys():
         attachments = data['attachments']
         if type(attachments) is list:
