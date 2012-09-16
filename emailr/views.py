@@ -168,7 +168,9 @@ def renderPost(recipient, post):
     elif len(pictures) == 1:
         template = 'one_img_post.html'
         inputs['img1'] = pictures[0]
+        print pictures[0]
         inputs['other_attachments'] = links + files
+        print "loading one image"
     elif len(links) > 0:
         template = 'link_post.html'
         if len(links) > 1:
@@ -363,19 +365,20 @@ def parseContacts(user, ccs_string):
 
 # generates a post out of the email and its recipients
 def generatePost(email, sender, recipients):
-    post = Post()
-    post.author = sender
+    post = Post.objects.create(author = sender, subject =  email.subject)
     post.save()
     post.recipients = recipients
-    post.subject = email.subject
+    post.save()
 
     #lines = email.text.split("\n")
+    post.text = ""
     lines = re.split(r'[\n\r]+', email.text)
     for line in lines:
         if not "r#" in line and not ">" in line[:2]:
             post.text += line
 
     # extract images/links from Attachments
+    post.save()
     content = []
     for att in email.attachments.all():
       link = att.link
