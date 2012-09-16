@@ -1,15 +1,16 @@
-from django.http import HttpResponse, Http404, HttpResponseRedirect, HttpRequest
-from django.template import Context, RequestContext, TemplateDoesNotExist
-from django.template.loader import render_to_string
-from django.shortcuts import render_to_response, redirect
-from django.views.generic.simple import direct_to_template
-import SmtpApiHeader
+#from django.http import HttpResponse, Http404, HttpResponseRedirect, HttpRequest
+#from django.template import Context, RequestContext, TemplateDoesNotExist
+#from django.template.loader import render_to_string
+#from django.shortcuts import render_to_response, redirect
+#from django.views.generic.simple import direct_to_template
+#import SmtpApiHeader
 import json
+import re
 from django.core.mail import EmailMultiAlternatives
 from emailr.models import *
 from django.views.decorators.http import require_POST
 from emailr.forms import *
-from django.views.decorators.csrf import csrf_exempt  
+from django.views.decorators.csrf import csrf_exempt
 
 def index(request):
     if request.method == 'POST':
@@ -132,44 +133,36 @@ def receiveEmail(request):
     #post = generatePost(email, contacts)
     return HttpResponse()
 
-def parseContacts(user, input_strings):
-    for emails in input_strings:
-        if ";" in emails:
-            email_list = emails.split(";")
-        else:
-            email_list = emails.split(",")
-        for email in email_list:
-            email_parts = email.replace('<', ' ').replace('>', ' ').split(" ")
-            address = [x.strip() for x in email_parts]
-            name = [x.strip() for x in email_parts if x not in address]
-            if len(address) == 1:
-                address = address[0]
-                print address
-                contact_user = User.objects.get(email = address.lower())
-                if contact_user is None:
-                    contact_user = User.objects.create(email = address.lower())
-                    contact_user.save
-
-                contacts = user.instance.contacts.filter(user = contact_user)
-
-                if contact is None:
-                    contact = user.instance.contacts.create(user = contact_user)
+# @params:
+#   (User) user
+#   (String) ccs_string of the format:
+#       <name> <\<email\>>[, or ;] . . .
+#       example:
+#           bobby bo <hhaf@adfads.com>, john <email@gmail.com>
+# @does:
+#   Adds contacts to user
+def parseContacts(user, ccs_string):
+    contacts = re.findall('([a-zA-Z]+)(\s[a-zA-Z]+)?\s+<(([^<>,;"]+|".+")+)>(,\s+)?', ccs_string)
+    for contact in contacts:
+        for i in range(len(contact)):
+            contact_user = User.objects.get_or_create(email = contact[2].lower(), first_name = contact[0], last_name = contact[1])[0]
+            contact_user.save()
+            contact = user.instance.contacts.get_or_create(user = contact_user)
+            contact.save()
 
 # generates a post out of the email and its recipients
-"""
 def generatePost(email, recipients):
     post = Post()
-    post.author = User.objects.get(email = email.from)
+    post.author = User.objects.get(email = email.sender)
     post.recipients = recipients
     post.subject = email.subject
 
     # refine the email's message
     post.text = ""
-    lines = email.text.split("\n")
+    #lines = email.text.split("\n")
+    lines = re.split(r'[\n\r]+', email.text)
     for line in lines:
-      if "r#" in line:
-        continue
-      else:
+      if not "r#" in line:
         post.text += line
 
     # extract images/links from Attachments
@@ -186,6 +179,5 @@ def generatePost(email, recipients):
       post.instance.content.add(cnt)
 
     post.likes = 0
-    post.timestampt = email.timestampt
+    post.timestamp = email.timestamp
     return post
-"""
