@@ -109,6 +109,7 @@ def testRender(request):
 #######################################################
 
 def renderPost(recipient, post):
+    print "rendering post......."
     #Check if recipent = post.author
     hdr = SmtpApiHeader.SmtpApiHeader()
 
@@ -191,6 +192,7 @@ def renderPost(recipient, post):
     
 
 def renderComment(recipient, comment):
+    print "rendering comment......."
     hdr = SmtpApiHeader.SmtpApiHeader()
     hdr.setCategory("initial")  
     replyToEmail = "p" + str(comment.post.id) + "c" + str(comment.id) + "@emailr.co"
