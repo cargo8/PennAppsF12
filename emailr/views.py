@@ -90,10 +90,10 @@ def register(request):
 
 def home(request):
     c = RequestContext(request, {'request': request})
-    return render_to_response('talks.html', c)
+    return render_to_response('home.html', c)
     
 def talks(request):
-    return render_to_response("talks.html")
+    return render_to_response("home.html")
 
 def testRender(request):
     return render_to_response('one_img_post.html')
