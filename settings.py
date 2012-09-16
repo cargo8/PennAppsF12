@@ -2,6 +2,7 @@
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
+import sys
 
 ADMINS = (
     ('Josh Wilson', 'wilson.joshual@gmail.com'),
