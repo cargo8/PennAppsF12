@@ -207,14 +207,14 @@ def parseContacts(user, ccs_string):
         c_email = contact[1]
            
         # find or create user from parsed info 
-        contact_user = user.instance.contacts.get_or_create(email = c_email.lower())[0]
+        contact_user = user.contacts.get_or_create(email = c_email.lower())[0]
         contact_user.save()
         
         # add parsed user to recipient list
         recipients.append(contact_user)
 
         # add new contact user to sender's contacts
-        contact = user.instance.contacts.get_or_create(user = contact_user)[0]
+        contact = user.contacts.get_or_create(user = contact_user)[0]
 
         contact.save()
 
@@ -245,6 +245,6 @@ def generatePost(email, sender, recipients):
         cnt.link_type = cnt.PICTURE
       else:
         cnt.link_type = cnt.FILE
-    post.instance.content.add(cnt)
+    post.content.add(cnt)
 
     return post.save()[0]
