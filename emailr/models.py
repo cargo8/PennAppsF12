@@ -1,16 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User as UserCred
 
-class EmailPreferences(models.Model):
-    private_posts = models.BooleanField(default=True)
-    private_commments = models.BooleanField(default=True)
-
-    public_posts = models.BooleanField(default=True)
-    public_commments = models.BooleanField(default=False)
-
-    digest = models.BooleanField(default=True)
-    digest_timeframe_days = models.IntegerField(default=1)
-
 class User(models.Model):
     cred = models.OneToOneField(UserCred, related_name = 'user_cred', null=True)
     friends = models.ManyToManyField("User")
@@ -18,13 +8,7 @@ class User(models.Model):
     profile_picture = models.URLField()
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
-    email_preferences = models.OneToOneField(EmailPreferences)
     activated = models.BooleanField(default=False)
-
-    def save(self, force_insert=False, force_update=False):
-        if self.email_preferences is None:
-            self.email_preferences = EmailPreferences()
-        super(User, self).save()
 
 class MailingListGroup(models.Model):
     owner = models.ForeignKey(User, related_name='mailing_list_owner')
