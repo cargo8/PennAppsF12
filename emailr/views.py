@@ -376,6 +376,7 @@ def generatePost(email, sender, recipients):
         post.text += line
 
     # extract images/links from Attachments
+    content = []
     for att in email.attachments.all():
       link = att.link
       ext = link.split(".")[-1].lower()
@@ -385,6 +386,7 @@ def generatePost(email, sender, recipients):
         cnt.link_type = cnt.PICTURE
       else:
         cnt.link_type = cnt.FILE
-      post.content.add(cnt)
+      content.add(cnt)
+    post.content = content
     post.save()
     return post
