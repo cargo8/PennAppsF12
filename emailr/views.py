@@ -112,9 +112,11 @@ def receiveEmail(request):
     data = request.POST
     attachments = 0
 
+    print data['from']
+    print data[u'from']
+
     if 'from' in data.keys():
         if type(data['from']) is list:
-            print data['from']
             output['sender'] = "; ".join(data['from'])
         else:
             output['sender'] = data['from']
