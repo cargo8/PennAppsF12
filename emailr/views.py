@@ -3,6 +3,8 @@ from django.template import Context, RequestContext, TemplateDoesNotExist
 from django.template.loader import render_to_string
 from django.shortcuts import render_to_response, redirect
 from django.views.generic.simple import direct_to_template
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import authenticate
 import SmtpApiHeader
 import json
 import re
@@ -11,6 +13,10 @@ from emailr.models import *
 from django.views.decorators.http import require_POST
 from emailr.forms import *
 from django.views.decorators.csrf import csrf_exempt
+
+#######################################################
+###### WEB CLIENT VIEW CODE ###########################
+#######################################################
 
 def index(request):
     if request.method == 'POST':
@@ -24,18 +30,44 @@ def index(request):
     return render_to_response('index.html', {'form': form})
 
 def signup(request):
-    return render_to_response('signup.html')
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            new_user = form.save()
+            return redirect(login)
+    else:
+        form = UserCreationForm()
 
+    c = RequestContext(request, {'form': form})
+
+    return render_to_response("signup.html", c)
+    
 def login(request):
-    return render_to_response('login.html')
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        user = authenticate(username=form['email'], password=form['password'])
+        if user is not None:
+            redirect(home)
+        else:
+            render_to_response('login.html', {'form':form})
+    else:
+        form = LoginForm()
 
-def renderComment(recipient, comment):
-    #Check if recipent = comment.author
+    c = RequestContext(request, {'form': form})
+    return render_to_response("login.html", c)
+
+def home(request):
     pass
+    
+def talks(request):
+    return render_to_response("talks.html")
 
 def testRender(request):
     return render_to_response('one_img_post.html')
 
+#######################################################
+###### BACKEND PROCESSING CODE ########################
+#######################################################
 
 def renderPost(recipient, post):
     #Check if recipent = post.author
@@ -103,6 +135,10 @@ def renderPost(recipient, post):
     msg = EmailMultiAlternatives(subject, text_content, fromEmail, [toEmail], headers={"X-SMTPAPI": hdr.asJSON()})
     msg.attach_alternative(html, "text/html")
     msg.send()
+
+def renderComment(recipient, comment):
+    #Check if recipent = comment.author
+    pass
 
 @require_POST
 @csrf_exempt 

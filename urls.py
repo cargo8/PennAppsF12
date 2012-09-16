@@ -14,11 +14,13 @@ urlpatterns = patterns('',
 
     # url(r'^$', direct_to_template, {'template': 'postcard.html'}),
     url(r'^render/', testRender),
-
+    
+    url(r'^home/', home),
     url(r'^$', index),
     url(r'^signup/$', signup),
     url(r'^login/$', login),
     url(r'^receiveEmail/$', receiveEmail),
+    url(r'^talks/$', talks),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
