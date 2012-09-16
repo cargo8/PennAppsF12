@@ -14,6 +14,7 @@ from emailr.models import *
 from django.views.decorators.http import require_POST
 from emailr.forms import *
 from django.views.decorators.csrf import csrf_exempt
+from image_handler import save_image
 
 #######################################################
 ###### WEB CLIENT VIEW CODE ###########################
@@ -219,21 +220,19 @@ def receiveEmail(request):
     email = Email(**output)
     email.save()
 
-    for i in range(1,int(attachments)
-        +1):
+    for i in range(1,int(attachments)+1):
         attachment = request.FILES['attachment%d' % i]
         #Use filepicker.io file = attachment.read()
-        link = None
+        link = save_image(attachment)
         email.attachments.create(link=link)
 
-    try:
-        if "info" in email.to:
-            #This is for a new post
-            ccs_string = email.text.split('\n')[0]
-            if "r#" in ccs_string:
-                ccs_string = ccs_string.replace("r#", "")
-            else:
-                last_name = first_last[1]
+    if "info" in email.to:
+        #This is for a new post
+        ccs_string = email.text.split('\n')[0]
+        if "r#" in ccs_string:
+            ccs_string = ccs_string.replace("r#", "")
+        else:
+            last_name = first_last[1]
 
     sender = User.objects.get_or_create(email = sender_email[0][1])[0]
     if not sender.first_name:
@@ -269,10 +268,7 @@ def receiveEmail(request):
                     ext = link.split(".")[-1].lower()
                     cnt = Content()
                     cnt.link = link
-                    if ext in ["jpg", "png", "gif"]:
-                        cnt.link_type = cnt.PICTURE
-                    else:
-                        cnt.link_type = cnt.FILE
+                    cnt.link_type = cnt.PICTURE
                     content.add(cnt)
             comment = Comment.objects.create(author = sender, text = email.text, post = post)
             comment.save()
