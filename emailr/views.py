@@ -33,7 +33,10 @@ def index(request):
 
 def signup(request):
     if request.user.is_authenticated():
-        return HttpResponseRedirect('/register/')
+        if request.user.is_active:
+            return HttpResponseRedirect('/home/')
+        else:
+            return HttpResponseRedirect('/register/')
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
@@ -81,11 +84,9 @@ def register(request):
             user.first_name = request.POST['first_name']
             user.last_name = request.POST['last_name']
             user.save()
-
             user.activated = True
+            user.is_active = True
             user.save()
-            if request.user.is_authenticated():
-                return HttpResponseRedirect('/home/')
 
             return render_to_response("home.html")
     else:
