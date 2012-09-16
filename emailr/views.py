@@ -34,7 +34,8 @@ def renderComment(recipient, comment):
     pass
 
 def testRender(request):
-    pass
+    return render_to_response('text_post.html')
+
 
 def renderPost(recipient, post):
     #Check if recipent = post.author
@@ -158,7 +159,7 @@ def receiveEmail(request):
     ccs_string = email.text.split('\n')[0]
     if "r#" in ccs_string:
         ccs_string = ccs_string.replace("r#", "")
-    sender = User.objects.get_or_create(email = email.lower())
+    sender = User.objects.get_or_create(email = email)
     contacts = parseContacts(sender , ccs_string)
     post = generatePost(email, sender, contacts)
     
