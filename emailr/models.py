@@ -16,7 +16,7 @@ class EmailPreferences(models.Model):
 	digest_timeframe_days = models.IntegerField(default=1)
 
 class User(models.Model):
-	cred = models.OneToOneField(models.User, related_name = 'user_cred')
+	cred = models.OneToOneField(models.User, related_name = 'user_cred', null=True)
 	friends = models.ManyToManyField(User)
 	email = models.EmailField()
 	profile_picture = models.URLField()
