@@ -4,6 +4,7 @@ from django.template.loader import render_to_string
 from django.shortcuts import render_to_response, redirect
 from django.views.generic.simple import direct_to_template
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import authenticate
 import SmtpApiHeader
 import json
 import re
@@ -42,7 +43,18 @@ def signup(request):
     return render_to_response("signup.html", c)
     
 def login(request):
-    return render_to_response('login.html')
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        user = authenticate(username=form['email'], password=form['password'])
+        if user is not None:
+            redirect(home)
+        else:
+            render_to_response('login.html', {'form':form})
+    else:
+        form = LoginForm()
+
+    c = RequestContext(request, {'form': form})
+    return render_to_response("login.html", c)
 
 def home(request):
     pass
