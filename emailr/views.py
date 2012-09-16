@@ -29,10 +29,8 @@ def signup(request):
 def login(request):
     return render_to_response('login.html')
 
-<<<<<<< HEAD
 def renderEmail(from_email, receiver_email, subject, post, commment = None):
-=======
-def sendPostEmail(request):
+#def sendPostEmail(request):
 
     pref1 = EmailPreferences()
     pref1.save()
@@ -40,14 +38,13 @@ def sendPostEmail(request):
     pref2.save()
 
     user1 = User(first_name = 'Jason', last_name = 'Mow', activated = True, email = 'jason.mow@gmail.com', email_preferences = pref1)
-    user1.save()
+    #user1.save()
 
     user2 = User(first_name = 'Ron', last_name = 'Weasley', activated = True, email = 'jason@jasonmow.com', email_preferences = pref2)
-    user2.save()
+    #user2.save()
     
     post = Post(author = user1, subject = 'Testing out Emailr Templates', text = 'Hey I just want to test that this template works', likes = 0)
-    post.save()
->>>>>>> a35fbe38a617a683a7d38ffa2c465a3983380cdf
+    #gpost.save()
 
     hdr = SmtpApiHeader.SmtpApiHeader()
     # The list of addresses this message will be sent to
