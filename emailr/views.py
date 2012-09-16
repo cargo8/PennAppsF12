@@ -14,14 +14,13 @@ from emailr.models import *
 from django.views.decorators.http import require_POST
 from emailr.forms import *
 from django.views.decorators.csrf import csrf_exempt
+from image_handler import save_image
 
 #######################################################
 ###### WEB CLIENT VIEW CODE ###########################
 #######################################################
 
 def index(request):
-    if request.user.is_authenticated:
-        return redirect(home)
     if request.method == 'POST':
         form = TryItForm(request.POST)
         if form.is_valid():
@@ -33,6 +32,8 @@ def index(request):
     return render_to_response('index.html', {'form': form, 'request': request})
 
 def signup(request):
+    if request.user.is_authenticated():
+        return HttpResponseRedirect('/register/')
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
@@ -41,7 +42,10 @@ def signup(request):
             u.save()
             u.auth = new_user
             u.save()
-            return redirect(register)
+            
+            user = authenticate(username=request.POST['username'], password=request.POST['password1']) 
+            auth.login(request, user)
+            return redirect(register) 
     else:
         form = UserCreationForm()
 
@@ -57,8 +61,7 @@ def login(request):
             auth.login(request, user)
             return redirect(home)
         else:
-            return redirect(index)
-            #render_to_response('login.html', {'form':form})
+            return render_to_response('login.html', {'form': LoginForm(request.POST), 'msg': 'Your username and password did not match. Please check your credentials and try again.'})
     else:
         form = LoginForm()
 
@@ -68,7 +71,7 @@ def login(request):
 def logout(request):
     auth.logout(request)
     form = TryItForm()
-    return render_to_response('index.html', {'request': request, 'form': form, 'msg': 'You have successfully logged out.'})
+    return render_to_response('index.html', {'form': form, 'msg': 'You have successfully logged out.'})
 
 def register(request):
     if request.method == 'POST':
@@ -81,7 +84,10 @@ def register(request):
 
             user.activated = True
             user.save()
-            return render_to_response("index.html", {'request':request})
+            if request.user.is_authenticated():
+                return HttpResponseRedirect('/home/')
+
+            return render_to_response("home.html")
     else:
         form = ProfileForm()
         
@@ -89,12 +95,11 @@ def register(request):
     return render_to_response("register.html", c)
 
 def home(request):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect('/login/?next=%s' % request.path)
     c = RequestContext(request, {'request': request})
-    return render_to_response('talks.html', c)
+    return render_to_response('home.html', c)
     
-def talks(request):
-    return render_to_response("talks.html")
-
 def testRender(request):
     return render_to_response('one_img_post.html')
 
@@ -147,6 +152,13 @@ def renderPost(recipient, post):
 
     template = None
     inputs = {'post' : post, 'recipent' : recipient, 'is_author' : is_author}
+
+    if recipient in post.likes.all():
+        inputs['liked'] = 1
+    else:
+        inputs['liked'] = 0
+
+    inputs['likes'] = len(post.likes.all())
 
     if len(pictures) > 1:
         template = 'two_img_post.html'
@@ -212,17 +224,47 @@ def receiveEmail(request):
         output['html'] = data['html']
     if 'subject' in data.keys():
         output['subject'] = data['subject']
+    try:
+        email = Email(**output)
+        email.save()
+    
+        for i in range(1,int(attachments)+1):
+            attachment = request.FILES['attachment%d' % i]
+            #Use filepicker.io file = attachment.read()
+            print "Before link"
+            link = save_image(attachment)
+            print link
+            email.attachments.create(link=link)
+    except Exception as e:
+        print 'a', e
+        print e.message
+        return HttpResponse()
+    print "past 2"
+    try:
+        sender_email = re.findall('(([^, ]+)(\s*,\s*)?)', email.sender)
+        first_last = email.sender.split(" ")
+        first_name = None
+        last_name = None
+        if "@" not in first_last[0]:
+            if "," not in first_last[0]:
+                first_name = first_last[0]
+            else:
+                last_name = first_last[0]
+            if len(first_last) > 2 and "@" not in first_last[1]:
+                if last_name:
+                    first_name = first_last[1]
+                else:
+                    last_name = first_last[1]
+        sender = User.objects.get_or_create(email = sender_email[0][1])[0]
+        if not sender.first_name:
+            sender.first_name = first_name
+        if not sender.last_name:
+            sender.last_name = last_name
 
-    email = Email(**output)
-    email.save()
-
-    for i in range(1,int(attachments)
-        +1):
-        attachment = request.FILES['attachment%d' % i]
-        #Use filepicker.io file = attachment.read()
-        link = None
-        email.attachments.create(link=link)
-
+        sender.save()
+    except Exception as e:
+        print "b", e.message
+        return HttpResponse()
     try:
         if "info" in email.to:
             #This is for a new post
@@ -231,43 +273,51 @@ def receiveEmail(request):
                 ccs_string = ccs_string.replace("r#", "")
             else:
                 ccs_string = None
-            sender_email = re.findall('(([^, ]+)(\s*,\s*)?)', email.sender)
-            first_last = email.sender.split(" ")
-            first_name = None
-            last_name = None
-            if "@" not in first_last[0]:
-                if "," not in first_last[0]:
-                    first_name = first_last[0]
-                else:
-                    last_name = first_last[0]
-                if len(first_last) > 2 and "@" not in first_last[1]:
-                    if last_name:
-                        first_name = first_last[1]
-                    else:
-                        last_name = first_last[1]
-
-            sender = User.objects.get_or_create(email = sender_email[0][1])[0]
-            if not sender.first_name:
-                sender.first_name = first_name
-            if not sender.last_name:
-                sender.last_name = last_name
-            sender.save()
             
-            contacts = parseContacts(sender , ccs_string)
-            post = generatePost(email, sender, contacts)
-                
+            try:
+                contacts = parseContacts(sender , ccs_string)
+            except Exception as e:
+                print "contacts", e.message
+                return HttpResponse()
+            try:
+                post = generatePost(email, sender, contacts)
+            except Exception as e:
+                print "post", e.message
+                return HttpResponse()
+            
             renderPost(sender, post)
             for contact in contacts:
                 renderPost(contact, post)
-        to_groups = re.match('P(\d+)', email.to)
-        if to_groups:
-            post = Post.objects.get(id = to_groups.group(1))
-            sender = User.objects.get_or_create(email = email.sender)[0]
-            contacts = post.recipients + post.author
-            for contact in contacts:
-                renderComment(contact, post)
+        to_groups = re.match('p(\d+)(c(\d+))?', email.to)
     except Exception as e:
-        print e.message
+        print "c", e.message
+        return HttpResponse()
+    try:
+        if to_groups:
+            content = []
+            post = Post.objects.get(id = to_groups.group(1))
+            if to_groups.group(3):
+                last_comment = Comment.objects.get(id = to_groups.group(3))
+                
+                for att in email.attachments.all():
+                    link = att.link
+                    ext = link.split(".")[-1].lower()
+                    cnt = Content()
+                    cnt.link = link
+                    cnt.link_type = cnt.PICTURE
+                    content.add(cnt)
+            comment = Comment.objects.create(author = sender, text = email.text, post = post)
+            comment.save()
+            if len(content) > 0:
+                comment.content = content
+            comment.save()
+
+            renderComment(post.author, comment)
+            contacts = post.recipients.all()
+            for contact in contacts:
+                renderComment(contact, comment)
+    except Exception as e:
+        print "d", e.message
     return HttpResponse()
 
 # @params:
@@ -319,11 +369,10 @@ def generatePost(email, sender, recipients):
     post.recipients = recipients
     post.subject = email.subject
 
-    post.text = email.text
     #lines = email.text.split("\n")
     lines = re.split(r'[\n\r]+', email.text)
     for line in lines:
-      if not "r#" in line:
+      if not "r#" in line and if not ">" in line[:2]:
         post.text += line
 
     # extract images/links from Attachments
