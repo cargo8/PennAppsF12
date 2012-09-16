@@ -208,6 +208,7 @@ def renderComment(recipient, comment):
     msg.attach_alternative(html, "text/html")
     msg.send()
 
+
 @require_POST
 @csrf_exempt 
 def receiveEmail(request):
