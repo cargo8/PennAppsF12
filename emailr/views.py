@@ -281,10 +281,11 @@ def receiveEmail(request):
     to_groups = re.match('p(\d+)(c(\d+))?', email.to)
     try:
         if to_groups:
+            content = []
             post = Post.objects.get(id = to_groups.group(1))
             if to_groups.group(3):
                 last_comment = Comment.objects.get(id = to_groups.group(3))
-                content = []
+                
                 for att in email.attachments.all():
                     link = att.link
                     ext = link.split(".")[-1].lower()
