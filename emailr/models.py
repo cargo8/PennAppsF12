@@ -1,9 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
-
-class MailingListGroup(models.Model):
-	owner = models.ForeignKey(User, related_name='mailing_list_owner')
-	members = models.ManyToManyField(User, , related_name='mailing_list_members'))
+from django.contrib.auth.models import User as UserCred
 
 class EmailPreferences(models.Model):
 	private_posts = models.BooleanField(default=True)
@@ -16,14 +12,18 @@ class EmailPreferences(models.Model):
 	digest_timeframe_days = models.IntegerField(default=1)
 
 class User(models.Model):
-	cred = models.OneToOneField(models.User, related_name = 'user_cred', null=True)
-	friends = models.ManyToManyField(User)
+	cred = models.OneToOneField(UserCred, related_name = 'user_cred', null=True)
+	friends = models.ManyToManyField("User")
 	email = models.EmailField()
 	profile_picture = models.URLField()
 	first_name = models.CharField(max_length=50)
 	last_name = models.CharField(max_length=50)
 	email_preferences = models.OneToOneField(EmailPreferences)
 	activated = models.BooleanField(default=False)
+
+class MailingListGroup(models.Model):
+	owner = models.ForeignKey(User, related_name='mailing_list_owner')
+	members = models.ManyToManyField(User, related_name='mailing_list_members')
 
 class Content(models.Model):
 	WEBSITE = 0

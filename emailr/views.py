@@ -31,6 +31,11 @@ def login(request):
 
 def renderComment(recipient, comment):
     #Check if recipent = comment.author
+    pass
+
+def testRender(request):
+    return render_to_response('text_post.html')
+
 
 def renderPost(recipient, post):
     #Check if recipent = post.author
@@ -62,9 +67,9 @@ def renderPost(recipient, post):
     files = []
 
     for attachment in post.attachments:
-        if attachment.link_type = attachment.PICTURE:
+        if attachment.link_type == attachment.PICTURE:
             pictures.append(attachment)
-        elif attachment.link_type = attachment.WEBSITE:
+        elif attachment.link_type == attachment.WEBSITE:
             links.append(attachment)
         else:
             files.append(attachment)
@@ -72,22 +77,22 @@ def renderPost(recipient, post):
     template = None
     inputs = {'post' : post, 'recipent' : recipent, 'is_author' : is_author}
     if len(pictures) > 1:
-        template = 'two-img-post.html'
+        template = 'two_img_post.html'
         inputs['img1'] = pictures[0]
         inputs['img2'] = pictures[1]
         inputs['other_attachments'] = pictures[2:] + links + files
     elif len(pictures) == 1:
-        template = 'one-img-post.html'
+        template = 'one_img_post.html'
         inputs['img1'] = pictures[0]
         inputs['other_attachments'] = links + files
     elif len(links) > 0:
-        template = 'link-post.html'
+        template = 'link_post.html'
         if len(links) > 1:
             inputs['other_attachments'] = links[1:] + files
         else:
             inputs['other_attachments'] = files
     else:
-        template = 'text-post.html'
+        template = 'text_post.html'
         inputs['other_attachments'] = files
 
 
@@ -154,7 +159,7 @@ def receiveEmail(request):
     ccs_string = email.text.split('\n')[0]
     if "r#" in ccs_string:
         ccs_string = ccs_string.replace("r#", "")
-    sender = User.objects.get_or_create(email = email.lower())
+    sender = User.objects.get_or_create(email = email)
     contacts = parseContacts(sender , ccs_string)
     post = generatePost(email, sender, contacts)
     
@@ -182,30 +187,35 @@ def receiveEmail(request):
 #@returns : all recipients
 
 def parseContacts(user, ccs_string):
-    contacts = re.findall('([a-zA-Z]+)(\s[a-zA-Z]+)?\s+<(([^<>,;"]+|".+")+)>(,\s+)?', ccs_string)
+##    contacts = re.findall('([a-zA-Z]+)(\s[a-zA-Z]+)?\s+<(([^<>,;"]+|".+")+)>(,\s+)?', ccs_string)
+##    recipients = []
+##
+##    for contact in contacts:
+##        for i in range(len(contact)):
+##            c_fname = contact_user[0]
+##            c_lname = c_email = ""
+##            for i in range(1, len(contact_user)):
+##                if "@" in contact_user[i]:
+##                    c_email = contact_user[i]
+##                    break
+##                c_lname += contact_user[i] + " "
+##            c_lname = c_lname.strip()
+    contacts = re.findall('(([^, ]+)(\s*,\s*)?)', ccs_string)
     recipients = []
 
     for contact in contacts:
-        for i in range(len(contact)):
-            c_fname = contact_user[0]
-            c_lname = c_email = ""
-            for i in range(1, len(contact_user)):
-                if "@" in contact_user[i]:
-                    c_email = contact_user[i]
-                    break
-                c_lname += contact_user[i] + " "
-            c_lname = c_lname.strip()
+        c_email = contact[1]
            
-            # find or create user from parsed info 
-            contact_user = User.objects.get_or_create(email = c_email.lower(), first_name = c_fname, last_name = c_lname)[0]
-            contact_user.save()
-            
-            # add parsed user to recipient list
-            recipients.append(contact_user)
+        # find or create user from parsed info 
+        contact_user = User.objects.get_or_create(email = c_email.lower())[0]
+        contact_user.save()
+        
+        # add parsed user to recipient list
+        recipients.append(contact_user)
 
-            # add new contact user to sender's contacts
-            contact = user.instance.contacts.get_or_create(user = contact_user)
-            contact.save()
+        # add new contact user to sender's contacts
+        contact = user.instance.contacts.get_or_create(user = contact_user)
+        contact.save()
 
     return recipients
 
