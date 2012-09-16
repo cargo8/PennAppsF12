@@ -92,7 +92,7 @@ def renderPost(recipient, post):
     hdr.setCategory("initial")  
     replyToEmail = "p" + str(post.id) + "@emailr.co"
     hdr.setReplyTo(replyToEmail)
-
+    print hdr
     fromEmail =  "info@emailr.co"
     toEmail = recipient.email
 
@@ -105,7 +105,8 @@ def renderPost(recipient, post):
     
     is_author = recipient == post.author
 
-    name =  post.author.first_name + " " + post.author.last_name
+    name =  "I dont like names" #post.author.first_name + " " + post.author.last_name
+
     text_content = name + " has shared something with you using Emailr:\n\n" + post.text
     text_content += "\n\n\nIf you would like to comment on this post just reply to this email."
 
@@ -123,6 +124,7 @@ def renderPost(recipient, post):
 
     template = None
     inputs = {'post' : post, 'recipent' : recipient, 'is_author' : is_author}
+
     if len(pictures) > 1:
         template = 'two_img_post.html'
         inputs['img1'] = pictures[0]
@@ -142,14 +144,14 @@ def renderPost(recipient, post):
         template = 'text_post.html'
         inputs['other_attachments'] = files
 
+    try:
+        html = render_to_string(template, inputs);
 
-    print str(toEmail)
-
-    html = render_to_string(template, inputs);
-
-    msg = EmailMultiAlternatives(subject, text_content, fromEmail, [toEmail], headers={"X-SMTPAPI": hdr.asJSON()})
-    msg.attach_alternative(html, "text/html")
-    msg.send()
+        msg = EmailMultiAlternatives(subject, text_content, fromEmail, [toEmail], headers={"X-SMTPAPI": hdr.asJSON()})
+        msg.attach_alternative(html, "text/html")
+        msg.send()
+    except Exception as e:
+        print e
 
 def renderComment(recipient, comment):
     #Check if recipent = comment.author
@@ -211,17 +213,11 @@ def receiveEmail(request):
         ccs_string = None
 
     sender = User.objects.get_or_create(email = email.sender)[0]
-    print ccs_string
-    try:
-        contacts = parseContacts(sender , ccs_string)
-        print contacts
-        post = generatePost(email, sender, contacts)
-        print post
-        renderPost(sender, post)
-        for contact in contacts:
-            renderPost(contact, post)
-    except Exception as e:
-            print e.value
+    contacts = parseContacts(sender , ccs_string)
+    post = generatePost(email, sender, contacts)
+    renderPost(sender, post)
+    for contact in contacts:
+        renderPost(contact, post)
     ##
 
     #Comment
@@ -262,7 +258,6 @@ def parseContacts(user, ccs_string):
     recipients = []
 
     for contact in contacts:
-        print contact
         c_email = contact[1]
            
         # find or create user from parsed info 
