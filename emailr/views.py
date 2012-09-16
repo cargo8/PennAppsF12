@@ -153,12 +153,12 @@ def renderPost(recipient, post):
     template = None
     inputs = {'post' : post, 'recipent' : recipient, 'is_author' : is_author}
 
-    if recipient in post.likes:
+    if recipient in post.likes.all():
         inputs['liked'] = 1
     else:
         inputs['liked'] = 0
 
-    inputs['likes'] = len(post.likes)
+    inputs['likes'] = len(post.likes.all())
 
     if len(pictures) > 1:
         template = 'two_img_post.html'
@@ -262,7 +262,10 @@ def receiveEmail(request):
             sender.last_name = last_name
 
         sender.save()
-
+    except Exception as e:
+        print "b", e.message
+        return HttpResponse()
+    try:
         if "info" in email.to:
             #This is for a new post
             ccs_string = email.text.split('\n')[0]
@@ -271,15 +274,23 @@ def receiveEmail(request):
             else:
                 ccs_string = None
             
-            contacts = parseContacts(sender , ccs_string)
-            post = generatePost(email, sender, contacts)
+            try:
+                contacts = parseContacts(sender , ccs_string)
+            except Exception as e:
+                print "contacts", e.message
+                return HttpResponse()
+            try:
+                post = generatePost(email, sender, contacts)
+            except Exception as e:
+                print "post", e.message
+                return HttpResponse()
             
             renderPost(sender, post)
             for contact in contacts:
                 renderPost(contact, post)
         to_groups = re.match('p(\d+)(c(\d+))?', email.to)
     except Exception as e:
-        print "b", e.message
+        print "c", e.message
         return HttpResponse()
     try:
         if to_groups:
@@ -306,7 +317,7 @@ def receiveEmail(request):
             for contact in contacts:
                 renderComment(contact, comment)
     except Exception as e:
-        print "c", e.message
+        print "d", e.message
     return HttpResponse()
 
 # @params:
@@ -358,11 +369,10 @@ def generatePost(email, sender, recipients):
     post.recipients = recipients
     post.subject = email.subject
 
-    post.text = email.text
     #lines = email.text.split("\n")
     lines = re.split(r'[\n\r]+', email.text)
     for line in lines:
-      if not "r#" in line:
+      if not "r#" in line and if not ">" in line[:2]:
         post.text += line
 
     # extract images/links from Attachments
