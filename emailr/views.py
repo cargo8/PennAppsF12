@@ -29,37 +29,20 @@ def signup(request):
 def login(request):
     return render_to_response('login.html')
 
-def renderEmail(from_email, receiver_email, subject, post, commment = None):
-#def sendPostEmail(request):
+def renderComment(recipient, comment):
+    #Check if recipent = comment.author
 
-    pref1 = EmailPreferences()
-    pref1.save()
-    pref2 = EmailPreferences()
-    pref2.save()
-
-    user1 = User(first_name = 'Jason', last_name = 'Mow', activated = True, email = 'jason.mow@gmail.com', email_preferences = pref1)
-    #user1.save()
-
-    user2 = User(first_name = 'Ron', last_name = 'Weasley', activated = True, email = 'jason@jasonmow.com', email_preferences = pref2)
-    #user2.save()
-    
-    post = Post(author = user1, subject = 'Testing out Emailr Templates', text = 'Hey I just want to test that this template works', likes = 0)
-    #gpost.save()
-
+def renderPost(recipient, post):
+    #Check if recipent = post.author
     hdr = SmtpApiHeader.SmtpApiHeader()
-    # The list of addresses this message will be sent to
-    #TODO: extract recipient emails from User objects
-    recipients = post.recipients.all()
-
-    hdr.addTo(recipients)
 
     # Specify that this is an initial contact message
-    hdr.setCategory("initial")
+    hdr.setCategory("initial")  
+    replyToEmail = "p" + str(comment.post.id) + "@emailr.co"
+    hdr.setReplyTo(replyToEmail)
 
-    # toEmail is recipient's email address
-    # For multiple recipient e-mails, the 'toEmail' address is irrelivant
-    fromEmail =  'info@emailr.co'
-    toEmail = 'info@emailr.co'
+    fromEmail =  "info@emailr.co"
+    toEmail = recipent.email
 
     # text is your plain-text email
     # html is your html version of the email
@@ -68,23 +51,56 @@ def renderEmail(from_email, receiver_email, subject, post, commment = None):
 
     subject = post.subject
     
+    is_author = recipent == post.author
+
     name =  post.author.first_name + " " + post.author.last_name
     text_content = name + " has shared something with you using Emailr:\n\n" + post.text
     text_content += "\n\n\nIf you would like to comment on this post just reply to this email."
 
-    html = render_to_string('postcard.html', {
-        'message_text': post.text,
-        
-    });
+    pictures = []
+    links = []
+    files = []
+
+    for attachment in post.attachments:
+        if attachment.link_type = attachment.PICTURE:
+            pictures.append(attachment)
+        elif attachment.link_type = attachment.WEBSITE:
+            links.append(attachment)
+        else:
+            files.append(attachment)
+
+    template = None
+    inputs = {'post' : post, 'recipent' : recipent, 'is_author' : is_author}
+    if len(pictures) > 1:
+        template = 'two-img-post.html'
+        inputs['img1'] = pictures[0]
+        inputs['img2'] = pictures[1]
+        inputs['other_attachments'] = pictures[2:] + links + files
+    elif len(pictures) == 1:
+        template = 'one-img-post.html'
+        inputs['img1'] = pictures[0]
+        inputs['other_attachments'] = links + files
+    elif len(links) > 0:
+        template = 'link-post.html'
+        if len(links) > 1:
+            inputs['other_attachments'] = links[1:] + files
+        else:
+            inputs['other_attachments'] = files
+    else:
+        template = 'text-post.html'
+        inputs['other_attachments'] = files
+
+
+        #
+
+    html = render_to_string(template, inputs);
 
     msg = EmailMultiAlternatives(subject, text_content, fromEmail, [toEmail], headers={"X-SMTPAPI": hdr.asJSON()})
     msg.attach_alternative(html, "text/html")
-    msg.send()
+    #msg.send()
 
-    c = RequestContext(request, {
-
-        })
-    return render_to_response('postcard.html', c)
+    c = RequestContext(request, inputs)
+    return render_to_response(template, c)
 
 @require_POST
 @csrf_exempt 
@@ -134,12 +150,25 @@ def receiveEmail(request):
         email.attachments.create(link=link)
 
     #This is for a new post
+    ###########################################
     ccs_string = email.text.split('\n')[0]
     if "r#" in ccs_string:
         ccs_string = ccs_string.replace("r#", "")
     sender = User.objects.get_or_create(email = email.lower())
     contacts = parseContacts(sender , ccs_string)
     post = generatePost(email, sender, contacts)
+    
+    renderPost(sender, post)
+    for contact in contacts:
+        renderPost(contact, post)
+    ##
+
+    #Comment
+    """
+    renderComment(sender, post)
+    for contact in contacts:
+        renderComment(contact, post)
+    """
     return HttpResponse()
 
 # @params:
