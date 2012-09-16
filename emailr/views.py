@@ -238,8 +238,7 @@ def receiveEmail(request):
     email = Email(**output)
     email.save()
 
-    for i in range(1,int(attachments)
-        +1):
+    for i in range(1,int(attachments)+1):
         attachment = request.FILES['attachment%d' % i]
         #Use filepicker.io file = attachment.read()
         link = None
@@ -248,6 +247,7 @@ def receiveEmail(request):
     first_last = email.sender.split(" ")
     first_name = None
     last_name = None
+    print "HELLO WORLD"
     if "@" not in first_last[0]:
         if "," not in first_last[0]:
             first_name = first_last[0]
@@ -259,50 +259,51 @@ def receiveEmail(request):
             else:
                 last_name = first_last[1]
 
+    print "HELLO WORLD"
     sender = User.objects.get_or_create(email = sender_email[0][1])[0]
     if not sender.first_name:
         sender.first_name = first_name
     if not sender.last_name:
         sender.last_name = last_name
+    print "HELLO WORLD"
     sender.save()
-
-    try:
-        if "info" in email.to:
-            #This is for a new post
-            ccs_string = email.text.split('\n')[0]
-            if "r#" in ccs_string:
-                ccs_string = ccs_string.replace("r#", "")
-            else:
-                ccs_string = None
-            
-            contacts = parseContacts(sender , ccs_string)
-            post = generatePost(email, sender, contacts)
-                
+    if "info" in email.to:
+        #This is for a new post
+        ccs_string = email.text.split('\n')[0]
+        if "r#" in ccs_string:
+            ccs_string = ccs_string.replace("r#", "")
+        else:
+            ccs_string = None
+        
+        contacts = parseContacts(sender , ccs_string)
+        post = generatePost(email, sender, contacts)
+        print "HELLO WORLD"
+        try:
             renderPost(sender, post)
             for contact in contacts:
                 renderPost(contact, post)
-        to_groups = re.match('p(\d+)(c(\d+))?', email.to)
-        if to_groups:
-            post = Post.objects.get(id = to_groups.group(1))
-            if to_groups.group(3):
-                last_comment = Comment.objects.get(id = to_groups.group(3))
-                content = []
-                for att in email.attachments.all():
-                    link = att.link
-                    ext = link.split(".")[-1].lower()
-                    cnt = Content()
-                    cnt.link = link
-                    if ext in ["jpg", "png", "gif"]:
-                        cnt.link_type = cnt.PICTURE
-                    else:
-                        cnt.link_type = cnt.FILE
-                    content.add(cnt)
-            comment = Comment.objects.create(author = sender, text = email.text, post = post, content = content)
-            contacts = post.recipients + post.author
-            for contact in contacts:
-                renderComment(contact, comment)
-    except Exception as e:
-        print e.message
+        except Exception as e:
+            print e.message
+    to_groups = re.match('p(\d+)(c(\d+))?', email.to)
+    if to_groups:
+        post = Post.objects.get(id = to_groups.group(1))
+        if to_groups.group(3):
+            last_comment = Comment.objects.get(id = to_groups.group(3))
+            content = []
+            for att in email.attachments.all():
+                link = att.link
+                ext = link.split(".")[-1].lower()
+                cnt = Content()
+                cnt.link = link
+                if ext in ["jpg", "png", "gif"]:
+                    cnt.link_type = cnt.PICTURE
+                else:
+                    cnt.link_type = cnt.FILE
+                content.add(cnt)
+        comment = Comment.objects.create(author = sender, text = email.text, post = post, content = content)
+        contacts = post.recipients + post.author
+        for contact in contacts:
+            renderComment(contact, comment)
     return HttpResponse()
 
 # @params:
