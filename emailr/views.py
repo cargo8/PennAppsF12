@@ -230,7 +230,7 @@ def receiveEmail(request):
     except Exception as e:
         print 'a', e
         print e.message
-    print 2
+        return HttpResponse()
     if "info" in email.to:
         #This is for a new post
         ccs_string = email.text.split('\n')[0]
