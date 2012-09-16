@@ -96,7 +96,7 @@ def renderPost(recipient, post):
         inputs['other_attachments'] = files
 
 
-    print toEmail
+    print str(toEmail)
 
     html = render_to_string(template, inputs);
 
