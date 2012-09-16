@@ -47,7 +47,7 @@ def renderPost(recipient, post):
     hdr.setReplyTo(replyToEmail)
 
     fromEmail =  "info@emailr.co"
-    toEmail = recipent.email
+    toEmail = recipient.email
 
     # text is your plain-text email
     # html is your html version of the email
@@ -56,7 +56,7 @@ def renderPost(recipient, post):
 
     subject = post.subject
     
-    is_author = recipent == post.author
+    is_author = recipient == post.author
 
     name =  post.author.first_name + " " + post.author.last_name
     text_content = name + " has shared something with you using Emailr:\n\n" + post.text
@@ -75,7 +75,7 @@ def renderPost(recipient, post):
             files.append(attachment)
 
     template = None
-    inputs = {'post' : post, 'recipent' : recipent, 'is_author' : is_author}
+    inputs = {'post' : post, 'recipent' : recipient, 'is_author' : is_author}
     if len(pictures) > 1:
         template = 'two_img_post.html'
         inputs['img1'] = pictures[0]
