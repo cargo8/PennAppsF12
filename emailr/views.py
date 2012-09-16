@@ -96,7 +96,10 @@ def receiveEmail(request):
             attachments = attachments[0]
 
     if 'to' in data.keys():
-        output['to'] = "; ".join(data['to'])
+         if type(data['to']) is list:
+            output['to'] = "; ".join(data['to'])
+        else:
+            output['to'] = data['to']
     if 'cc' in data.keys():
         output['cc'] = "; ".join(data['cc'])
     if 'text' in data.keys():
@@ -110,8 +113,14 @@ def receiveEmail(request):
         output['subject'] = data['subject']
 
     print output
+
+    for key in output.keys():
+        if type(output[key]) is dict:
+            print key
+            print output[key])
     email = Email(output)
     email.save()
+
     for i in range(1,attachments+1):
             attachment = request.FILES['attachment%d' % i]
             #Use filepicker.io file = attachment.read()
