@@ -83,6 +83,8 @@ def receiveEmail(request):
     output = {}
 
     data = request.POST
+    print data
+    
     attachments = 0
 
     if 'from' in data.keys():
