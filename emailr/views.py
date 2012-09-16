@@ -123,11 +123,11 @@ def receiveEmail(request):
     email.save()
 
     for i in range(1,attachments+1):
-            attachment = request.FILES['attachment%d' % i]
-            #Use filepicker.io file = attachment.read()
-            link = None
-            email.attachments.create(link=link)
-            
+        attachment = request.FILES['attachment%d' % i]
+        #Use filepicker.io file = attachment.read()
+        link = None
+        email.attachments.create(link=link)
+
     #This is for a new post
     ccs_string = email.text.split('\n')[0]
     if "r#" in ccs_string:
