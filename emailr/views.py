@@ -45,7 +45,7 @@ def signup(request):
     else:
         form = UserCreationForm()
 
-    c = RequestContext(request, {'form': form})
+    c = RequestContext(request, {'request': request, 'form': form})
 
     return render_to_response("signup.html", c)
     
@@ -62,17 +62,35 @@ def login(request):
     else:
         form = LoginForm()
 
-    c = RequestContext(request, {'form': form})
+    c = RequestContext(request, {'request':request, 'form': form})
     return render_to_response("login.html", c)
 
 def logout(request):
     auth.logout(request)
     form = TryItForm()
-    return render_to_response('index.html', {'form': form, 'msg': 'You have successfully logged out.'})
+    return render_to_response('index.html', {'request': request, 'form': form, 'msg': 'You have successfully logged out.'})
+
+def register(request):
+    if request.method == 'POST':
+        form = ProfileForm(request.POST)
+        if form.is_valid():
+            user = User.objects.get_or_create(email = request.POST['email'])[0]
+            user.first_name = request.POST['first_name']
+            user.last_name = request.POST['last_name']
+            user.save()
+
+            user.activated = True
+            user.save()
+            return render_to_response("index.html", {'request':request})
+    else:
+        form = ProfileForm()
+        
+    c = RequestContext(request, {'request':request, 'form': form})
+    return render_to_response("register.html", c)
 
 def home(request):
     c = RequestContext(request, {'request': request})
-    return render_to_response('index.html', c)
+    return render_to_response('talks.html', c)
     
 def talks(request):
     return render_to_response("talks.html")

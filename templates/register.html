@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}Emailr - Create Profile{% endblock %}
+
+{% block content %}
+<div class="hero-unit" style="background-color: whiteSmoke;" >
+  <h1>Fill out your Profile</h1>
+  <p>Share more through email.</p>
+    <form class="form-horizontal" action="." method="post">
+    {% csrf_token %}
+    
+    {{ form.email.errors }}
+	  <div class="control-group">
+	    <label class="control-label" for="id_username">Email / username:</label>
+	    <div class="controls">
+		    <input class="uneditable-input" type="text" name="email" id="id_email" value="{{ request.user.username }}"/>
+	    </div>
+	  </div>
+	  
+    {{ form.first_name.errors }}
+	  <div class="control-group">
+	    <label class="control-label" for="id_username">First name:</label>
+	    <div class="controls">
+         {{form.first_name }}
+	    </div>
+	  </div>
+	
+    {{ form.last_name.errors }}
+	  <div class="control-group">
+	    <label class="control-label" for="id_username">Last name:</label>
+	    <div class="controls">
+         {{form.last_name }}
+	    </div>
+	  </div>
+	  	
+	 {{ form.profile_picture.errors }}
+	  <div class="control-group">
+	    <label class="control-label" for="id_password2">Profile picture:</label>
+	    <div class="controls">
+           <input type="hidden" id="imageLink" name="profile_picture" />
+            <img id="localSpinner" class="hide" src="https://filepicker_static.s3.amazonaws.com/ce7b147/img/throbber.gif" alt="Loading..."/>
+			<input type="filepicker-dragdrop" data-fp-apikey="Am-wdmS5nQf29z8K7P7iOz" data-fp-option-container="modal" data-fp-option-services="COMPUTER,DROPBOX,FACEBOOK,GOOGLE_DRIVE,GMAIL,INSTAGRAM,URL,WEBCAM" onchange="saveLink()">	    </div>
+
+		<div class="form-actions">
+		  <a href="#"><button type="button" class="btn">Cancel</button></a>
+		  <button type="text" class="btn btn-primary" id="save">Save changes &raquo;</button>
+		</div>
+      	  
+	</form>
+</div>
+	  
+	  <script>
+         $(document).ready(function() {
+            $("#save").click(function() {
+               if($("#upFile").val() && $("#inputEmail").val()) {
+                 $('#localSpinner').show();
+                 filepicker.uploadFile(document.getElementById("upFile"), function(data){
+                     $('#imageLink').val(data.url);
+                     $('#localSpinner').hide();
+                 });
+               }
+            });
+         });
+      </script>
+{% endblock %}

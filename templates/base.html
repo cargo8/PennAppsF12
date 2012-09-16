@@ -24,11 +24,6 @@
 
     <!-- Le fav and touch icons -->
     <link rel="shortcut icon" href="/static/favicon.png">
-    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="../assets/ico/apple-touch-icon-144-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../assets/ico/apple-touch-icon-114-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
-    
     
     <!-- jQuery -->
     <script src="/static/jquery-1.7.2.min.js"></script>
@@ -38,8 +33,8 @@
     <script src="https://api.filepicker.io/v0/filepicker.js"></script>
     <script type="text/javascript">
       $(document).ready(function () {
-         //Seting up Filepicker.io with your api key
-         filepicker.setKey('AYcfTL5hpTamx9gQFYXqBz');
+/*          filepicker.setKey('AYcfTL5hpTamx9gQFYXqBz'); */
+         filepicker.setKey('Am-wdmS5nQf29z8K7P7iOz');
       });
     </script>
     
@@ -53,7 +48,7 @@
 	<div class="container">
     <a class="brand" href="/"><img src="/static/logo-no-bg.png" style="max-height: 50px;"></img></a>    
     <ul class="pull-right nav">
-    		{% if request.user %}
+    		{% if request.user.is_authenticated %}
     		<li><a href="/logout/" style="padding-top:25px;"><strong>Logout</strong></a></li>
     		{% else %}
 			<li><a href="/login/" style="padding-top:25px;"><strong>Login</strong></a></li>
