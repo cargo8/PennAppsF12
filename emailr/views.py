@@ -363,7 +363,9 @@ def parseContacts(user, ccs_string):
 
 # generates a post out of the email and its recipients
 def generatePost(email, sender, recipients):
-    post = Post.objects.create(author = sender, recipients = recipients, subject =  email.subject)
+    post = Post.objects.create(author = sender, subject =  email.subject)
+    post.save()
+    post.recipients = recipients
     post.save()
 
     #lines = email.text.split("\n")
@@ -374,6 +376,7 @@ def generatePost(email, sender, recipients):
             post.text += line
 
     # extract images/links from Attachments
+    post.save()
     content = []
     for att in email.attachments.all():
       link = att.link
