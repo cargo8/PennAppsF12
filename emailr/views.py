@@ -206,9 +206,7 @@ def receiveEmail(request):
         for contact in contacts:
             renderPost(contact, post)
     except Exception as e:
-            print e
-            import traceback
-            traceback.format_exc()
+            print e.value
     ##
 
     #Comment
