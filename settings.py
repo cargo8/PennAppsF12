@@ -155,21 +155,8 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'simple'
             },
-        'file': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': '/path/to/your/file.log',
-            'formatter': 'simple'
-            },
-        },
-    'loggers': {
-        'django': {
-            'handlers': ['file'],
-            'level': 'DEBUG',
-            'propagate': True,
-            },
-        }
     }
+}
 
 # SendGrid configuration for emails
 EMAIL_HOST = 'smtp.sendgrid.net'
