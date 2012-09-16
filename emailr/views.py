@@ -3,6 +3,7 @@ from django.template import Context, RequestContext, TemplateDoesNotExist
 from django.template.loader import render_to_string
 from django.shortcuts import render_to_response, redirect
 from django.views.generic.simple import direct_to_template
+from django.contrib.auth.forms import UserCreationForm
 import SmtpApiHeader
 import json
 import re
@@ -28,10 +29,23 @@ def index(request):
     return render_to_response('index.html', {'form': form})
 
 def signup(request):
-    return render_to_response('signup.html')
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            new_user = form.save()
+            return redirect(login)
+    else:
+        form = UserCreationForm()
 
+    c = RequestContext(request, {'form': form})
+
+    return render_to_response("signup.html", c)
+    
 def login(request):
     return render_to_response('login.html')
+
+def home(request):
+    pass
 
 def testRender(request):
     return render_to_response('one_img_post.html')
