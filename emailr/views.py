@@ -153,7 +153,7 @@ def renderPost(recipient, post):
     else:
         inputs['liked'] = 0
 
-    inputs['likes'] = len(post.likes)
+    inputs['likes'] = len(post.likes.all())
 
     if len(pictures) > 1:
         template = 'two_img_post.html'
