@@ -247,7 +247,6 @@ def receiveEmail(request):
     first_last = email.sender.split(" ")
     first_name = None
     last_name = None
-    print "HELLO WORLD"
     if "@" not in first_last[0]:
         if "," not in first_last[0]:
             first_name = first_last[0]
@@ -259,13 +258,12 @@ def receiveEmail(request):
             else:
                 last_name = first_last[1]
 
-    print "HELLO WORLD"
     sender = User.objects.get_or_create(email = sender_email[0][1])[0]
     if not sender.first_name:
         sender.first_name = first_name
     if not sender.last_name:
         sender.last_name = last_name
-    print "HELLO WORLD"
+
     sender.save()
     if "info" in email.to:
         #This is for a new post
@@ -277,11 +275,11 @@ def receiveEmail(request):
         
         contacts = parseContacts(sender , ccs_string)
         post = generatePost(email, sender, contacts)
-        print "HELLO WORLD"
         try:
             renderPost(sender, post)
             for contact in contacts:
                 renderPost(contact, post)
+            print "HELLO WORLD"
         except Exception as e:
             print e.message
     to_groups = re.match('p(\d+)(c(\d+))?', email.to)
