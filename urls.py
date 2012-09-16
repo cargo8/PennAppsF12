@@ -8,14 +8,17 @@ from emailr.views import *
 # admin.autodiscover()
 
 urlpatterns = patterns('',
-    url(r'^render/', testRender),
-    
+#    url(r'^render/', testRender),
+    url(r'^$', index),   
+    url(r'^learn/$', learn),
     url(r'^home/', home),
-    url(r'^$', index),
+
     url(r'^signup/$', signup),
     url(r'^register/$', register),
+
     url(r'login/', login),
     url(r'logout/$', logout),
+
     url(r'^receiveEmail/$', receiveEmail),
 
     # Uncomment the admin/doc line below to enable admin documentation:

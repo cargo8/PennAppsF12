@@ -100,6 +100,9 @@ def home(request):
         return HttpResponseRedirect('/login/?next=%s' % request.path)
     c = RequestContext(request, {'request': request})
     return render_to_response('home.html', c)
+
+def learn(request):
+    return render_to_response('learn.html')
     
 def testRender(request):
     return render_to_response('one_img_post.html')
