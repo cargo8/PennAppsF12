@@ -35,11 +35,11 @@ def sendPostEmail(request):
     pref1.save()
     pref2 = EmailPreferences()
     pref2.save()
- 
-    user1 = User(first_name = 'Jason', last_name = 'Mow', activated = True, email = 'jason.mow@gmail.com',)
+
+    user1 = User(first_name = 'Jason', last_name = 'Mow', activated = True, email = 'jason.mow@gmail.com', email_preferences = pref1)
     user1.save()
 
-    user2 = User(first_name = 'Ron', last_name = 'Weasley', activated = True, email = 'jason@jasonmow.com', email_preferences = EmailPreferences())
+    user2 = User(first_name = 'Ron', last_name = 'Weasley', activated = True, email = 'jason@jasonmow.com', email_preferences = pref2)
     user2.save()
     
     post = Post(author = user1, subject = 'Testing out Emailr Templates', text = 'Hey I just want to test that this template works', likes = 0)
@@ -48,7 +48,7 @@ def sendPostEmail(request):
     hdr = SmtpApiHeader.SmtpApiHeader()
     # The list of addresses this message will be sent to
     #TODO: extract recipient emails from User objects
-    recipients = post.recipients
+    recipients = post.recipients.all()
 
     hdr.addTo(recipients)
 
@@ -58,20 +58,21 @@ def sendPostEmail(request):
     # toEmail is recipient's email address
     # For multiple recipient e-mails, the 'toEmail' address is irrelivant
     fromEmail =  'info@emailr.co'
-    # toEmail = 'info@emailr.co'
+    toEmail = 'info@emailr.co'
 
     # text is your plain-text email
     # html is your html version of the email
     # if the reciever is able to view html emails then only the html
     # email will be displayed
 
-    subject = 'Hi <-name->, you have been sent an emailr'
+    subject = post.subject
     
     name =  post.author.first_name + " " + post.author.last_name
     text_content = name + " has shared something with you using Emailr:\n\n" + post.text
     text_content += "\n\n\nIf you would like to comment on this post just reply to this email."
 
     html = render_to_string('postcard.html', {
+        'message_text': post.text,
         
     });
 
@@ -137,7 +138,7 @@ def receiveEmail(request):
     sender.save()
 
     contacts = parseContacts(sender, email.cc)
-    # post = generatePost(email, contacts)
+    post = generatePost(email, contacts)
     # sendPostEmail(post)
     return HttpResponse()
 

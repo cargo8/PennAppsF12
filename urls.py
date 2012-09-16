@@ -13,7 +13,7 @@ urlpatterns = patterns('',
     # url(r'^pennappsf12/', include('pennapps12.foo.urls')),
 
     # url(r'^$', direct_to_template, {'template': 'postcard.html'}),
-    url(r'^render/', renderEmail),
+    url(r'^render/', sendPostEmail),
 
     url(r'^$', index),
     url(r'^signup/$', signup),
