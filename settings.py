@@ -170,7 +170,6 @@ LOGGING = {
             },
         }
     }
-}
 
 # SendGrid configuration for emails
 EMAIL_HOST = 'smtp.sendgrid.net'
