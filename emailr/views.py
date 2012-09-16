@@ -53,7 +53,6 @@ def testRender(request):
 #######################################################
 ###### BACKEND PROCESSING CODE ########################
 #######################################################
->>>>>>> 2bd461041701e81f1f14d85e49d5a29adabd4efb
 
 def renderPost(recipient, post):
     #Check if recipent = post.author

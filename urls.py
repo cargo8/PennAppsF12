@@ -14,12 +14,8 @@ urlpatterns = patterns('',
 
     # url(r'^$', direct_to_template, {'template': 'postcard.html'}),
     url(r'^render/', testRender),
-<<<<<<< HEAD
-
-=======
     
     url(r'^home/', home),
->>>>>>> 2bd461041701e81f1f14d85e49d5a29adabd4efb
     url(r'^$', index),
     url(r'^signup/$', signup),
     url(r'^login/$', login),
