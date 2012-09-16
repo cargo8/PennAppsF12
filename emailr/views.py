@@ -104,7 +104,13 @@ def renderPost(recipient, post):
     
     is_author = recipient == post.author
 
-    name =  "I dont like names" #post.author.first_name + " " + post.author.last_name
+    name =  ""
+    if post.author.first_name:
+        name = post.author.first_name
+    if post.author.last_name:
+        name += post.author.last_name
+    if len(name) < 1:
+        name = post.author.email
 
     text_content = name + " has shared something with you using Emailr:\n\n" + post.text
     text_content += "\n\n\nIf you would like to comment on this post just reply to this email."
@@ -207,8 +213,28 @@ def receiveEmail(request):
                 ccs_string = ccs_string.replace("r#", "")
             else:
                 ccs_string = None
-            sender = User.objects.get_or_create(email = email.sender)[0]
-                
+            sender_email = re.findall('(([^, ]+)(\s*,\s*)?)', email.sender)
+            first_last = email.sender.split(" ")
+            first_name = None
+            last_name = None
+            if "@" not in first_last[0]:
+                if "," not in first_last[0]:
+                    first_name = first_last[0]
+                else:
+                    last_name = first_last[0]
+                if len(first_last) > 2 and "@" not in first_last[1]:
+                    if last_name:
+                        first_name = first_last[1]
+                    else:
+                        last_name = first_last[1]
+
+            sender = User.objects.get_or_create(email = sender_email[0][1])[0]
+            if not sender.first_name:
+                sender.first_name = first_name
+            if not sender.last_name:
+                sender.last_name = last_name
+            sender.save()
+            
             contacts = parseContacts(sender , ccs_string)
             post = generatePost(email, sender, contacts)
                 
