@@ -232,36 +232,40 @@ def receiveEmail(request):
         print e.message
         return HttpResponse()
     print "past 2"
-    if "info" in email.to:
-        #This is for a new post
-        ccs_string = email.text.split('\n')[0]
-        if "r#" in ccs_string:
-            ccs_string = ccs_string.replace("r#", "")
-        else:
-            last_name = first_last[1]
+    try:
+        if "info" in email.to:
+            #This is for a new post
+            ccs_string = email.text.split('\n')[0]
+            if "r#" in ccs_string:
+                ccs_string = ccs_string.replace("r#", "")
+            else:
+                last_name = first_last[1]
 
-    sender = User.objects.get_or_create(email = sender_email[0][1])[0]
-    if not sender.first_name:
-        sender.first_name = first_name
-    if not sender.last_name:
-        sender.last_name = last_name
+        sender = User.objects.get_or_create(email = sender_email[0][1])[0]
+        if not sender.first_name:
+            sender.first_name = first_name
+        if not sender.last_name:
+            sender.last_name = last_name
 
-    sender.save()
-    if "info" in email.to:
-        #This is for a new post
-        ccs_string = email.text.split('\n')[0]
-        if "r#" in ccs_string:
-            ccs_string = ccs_string.replace("r#", "")
-        else:
-            ccs_string = None
-        
-        contacts = parseContacts(sender , ccs_string)
-        post = generatePost(email, sender, contacts)
-        
-        renderPost(sender, post)
-        for contact in contacts:
-            renderPost(contact, post)
-    to_groups = re.match('p(\d+)(c(\d+))?', email.to)
+        sender.save()
+        if "info" in email.to:
+            #This is for a new post
+            ccs_string = email.text.split('\n')[0]
+            if "r#" in ccs_string:
+                ccs_string = ccs_string.replace("r#", "")
+            else:
+                ccs_string = None
+            
+            contacts = parseContacts(sender , ccs_string)
+            post = generatePost(email, sender, contacts)
+            
+            renderPost(sender, post)
+            for contact in contacts:
+                renderPost(contact, post)
+        to_groups = re.match('p(\d+)(c(\d+))?', email.to)
+    except Exception as e:
+        print "b", e.message
+        return HttpResponse()
     try:
         if to_groups:
             content = []
@@ -287,7 +291,7 @@ def receiveEmail(request):
             for contact in contacts:
                 renderComment(contact, comment)
     except Exception as e:
-        print e.message
+        print "c", e.message
     return HttpResponse()
 
 # @params:

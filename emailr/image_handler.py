@@ -10,7 +10,7 @@ def save_image(instream):
 	bucket = conn.get_all_buckets()[0]
 	print "After 1"
 	k = Key(bucket)
-	k.key = str(time.localtime()) + str(random.randint(0,5000))
+	k.key = str(time.localtime() * 5000 + random.randint(0,5000))
 	print "After 1]2"
 	k.set_contents_from_string(instream.read())
 	print "Before return  1"
