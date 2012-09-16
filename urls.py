@@ -14,6 +14,7 @@ urlpatterns = patterns('',
     url(r'^$', index),
     url(r'^signup/$', signup),
     url(r'^login/$', login),
+    url(r'^logout/$', logout),
     url(r'^receiveEmail/$', receiveEmail),
     url(r'^talks/*', talks),
 

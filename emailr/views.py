@@ -65,9 +65,13 @@ def login(request):
     c = RequestContext(request, {'form': form})
     return render_to_response("login.html", c)
 
-#TODO
+def logout(request):
+    auth.logout(request)
+    form = TryItForm()
+    return render_to_response('index.html', {'form': form, 'msg': 'You have successfully logged out.'})
+
 def home(request):
-    c = RequestContext(request, {'request': request})    
+    c = RequestContext(request, {'request': request})
     return render_to_response('index.html', c)
     
 def talks(request):
@@ -195,33 +199,30 @@ def receiveEmail(request):
         link = None
         email.attachments.create(link=link)
 
-    #This is for a new post
-    ###########################################
     try:
+    if "info" in email.to:
+        #This is for a new post
         ccs_string = email.text.split('\n')[0]
         if "r#" in ccs_string:
             ccs_string = ccs_string.replace("r#", "")
         else:
             ccs_string = None
-
         sender = User.objects.get_or_create(email = email.sender)[0]
+            
         contacts = parseContacts(sender , ccs_string)
         post = generatePost(email, sender, contacts)
+            
         renderPost(sender, post)
         for contact in contacts:
             renderPost(contact, post)
-        ##
-
-        #Comment
-        """
-        renderComment(sender, post)
+    to_groups = re.match('P(\d+)', email.to)
+    if to_groups:
+        post = Post.objects.get(id = to_groups.group(1))
+        sender = User.objects.get_or_create(email = email.sender)[0]
+        contacts = post.recipients + post.author
         for contact in contacts:
             renderComment(contact, post)
-        """
-
-    except Exception as e:
-        print e.message
-
+        
     return HttpResponse()
 
 # @params:
