@@ -9,6 +9,8 @@
   <p>
     <form class="form-horizontal" action="." method="post">
     {% csrf_token %}
+    
+    {{ form.username.errors }}
 	  <div class="control-group">
 	    <label class="control-label" for="id_username">Email:</label>
 	    <div class="controls">
@@ -16,6 +18,7 @@
 	    </div>
 	  </div>
 
+	  {{ form.password1.errors }}
 	  <div class="control-group">
 	    <label class="control-label" for="id_password1">Password:</label>
 	    <div class="controls">
@@ -23,6 +26,7 @@
 	    </div>
 	  </div>
 	  
+	  	  {{ form.password2.errors }}
 	  <div class="control-group">
 	    <label class="control-label" for="id_password2">Password confirmation:</label>
 	    <div class="controls">
