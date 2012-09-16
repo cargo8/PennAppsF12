@@ -189,8 +189,24 @@ def renderPost(recipient, post):
     
 
 def renderComment(recipient, comment):
-    #Check if recipent = comment.author
-    pass
+    hdr = SmtpApiHeader.SmtpApiHeader()
+    hdr.setCategory("initial")  
+    replyToEmail = "p" + str(comment.post.id) + "c" + str(comment.id) + "@emailr.co"
+    
+    fromEmail =  "info@emailr.co"
+    toEmail = recipient.email.strip()
+
+    is_author = recipient == comment.author
+
+    template = 'text_post.html'
+    #inputs = {'comment' : comment, 'recipent' : recipient, 'is_author' : is_author}
+    inputs = {'post' : comment, 'recipent' : recipient, 'is_author' : is_author}
+
+    html = render_to_string(template, inputs);
+    
+    msg = EmailMultiAlternatives(subject, text_content, fromEmail, [toEmail], headers={"Reply-To" : replyToEmail, "X-SMTPAPI": hdr.asJSON()})
+    msg.attach_alternative(html, "text/html")
+    msg.send()
 
 @require_POST
 @csrf_exempt 
