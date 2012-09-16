@@ -88,7 +88,7 @@ def renderPost(recipient, post):
     hdr.setCategory("initial")  
     replyToEmail = "p" + str(post.id) + "@emailr.co"
     hdr.setReplyTo(replyToEmail)
-
+    print hdr
     fromEmail =  "info@emailr.co"
     toEmail = recipient.email
 
