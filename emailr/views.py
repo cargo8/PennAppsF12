@@ -315,15 +315,12 @@ def receiveEmail(request):
             post = Post.objects.get(id = to_groups.group(1))
             if to_groups.group(3):
                 last_comment = Comment.objects.get(id = to_groups.group(3))
-                
-                for att in email.attachments.all():
-                    link = att.link
-                    ext = link.split(".")[-1].lower()
-                    cnt = Content()
-                    cnt.link = link
-                    cnt.link_type = cnt.PICTURE
-                    content.add(cnt)
-            comment = Comment.objects.create(author = sender, text = email.text, post = post)
+
+            comment_text = ""
+            for line in email.text.split('\n'):
+                if '>' not in line[:2]:
+                    comment_text += line
+            comment = Comment.objects.create(author = sender, text = comment_text, post = post)
             comment.save()
             if len(content) > 0:
                 comment.content = content
@@ -392,9 +389,9 @@ def generatePost(email, sender, recipients):
         if not "r#" in line and not ">" in line[:2]:
             if ">" in line:
                 line = line[:line.find(">")]
-                post.text += line
+                post.text += line + '\n'
                 break
-            post.text += line
+            post.text += line + '\n'
 
     # extract images/links from Attachments
     post.save()
