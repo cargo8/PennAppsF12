@@ -66,6 +66,10 @@
                </li>
                <li>
                <hr />
+                  <ul class="nav nav-pills">
+                     <li id="comment" class="inactive"><a href="#">Comment</a></li>
+                     <li id="star" class="inactive"><a href="#"><img src="/static/star.png" id="starImg" style="padding-right:10px; "/>Star</a></li>
+                  </ul>
                <textarea rows="3" class="input-xxlarge"></textarea>
                <button type="submit" class="btn btn-primary" style="height:70px;">Send</button>
                <input type="filepicker-dragdrop" />
@@ -77,12 +81,14 @@
 
 
    <script>
-      $(document).ready(function() {
-         $('.inactive').click(function() {
-            $(".active").removeClass("active").addClass("inactive");
-            $("#"+this.id).removeClass("inactive").addClass("active");
-         });
-         
+      $('.inactive').click(function() {
+         $(".active").removeClass("active").addClass("inactive");
+         $("#"+this.id).removeClass("inactive").addClass("active");
+         return false;
+      });
+      
+      $("#star").click(function() {
+         $("#starImg").attr("src", "/static/star1.png");
       });
    </script>
 </div>
