@@ -253,8 +253,9 @@ def parseContacts(user, ccs_string):
         try:
             contact_user = user.contacts.get_or_create(email = c_email)[0]
             contact_user.save()
-        except e:
-            print e
+        except:
+            import traceback
+            traceback.print_stack()
         print c_email
         # add parsed user to recipient list
         recipients.append(contact_user)
