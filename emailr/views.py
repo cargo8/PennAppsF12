@@ -84,7 +84,6 @@ def receiveEmail(request):
     for key in request.POST.keys():
         email_form[key] = str(request.POST[key])
     form = EmailForm(email_form)
-    print form.cleaned_data
 
     if form.is_valid():
         email = form.save()
