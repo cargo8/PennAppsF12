@@ -226,14 +226,13 @@ def receiveEmail(request):
         link = None
         email.attachments.create(link=link)
 
-    try:
-        if "info" in email.to:
-            #This is for a new post
-            ccs_string = email.text.split('\n')[0]
-            if "r#" in ccs_string:
-                ccs_string = ccs_string.replace("r#", "")
-            else:
-                last_name = first_last[1]
+    if "info" in email.to:
+        #This is for a new post
+        ccs_string = email.text.split('\n')[0]
+        if "r#" in ccs_string:
+            ccs_string = ccs_string.replace("r#", "")
+        else:
+            last_name = first_last[1]
 
     sender = User.objects.get_or_create(email = sender_email[0][1])[0]
     if not sender.first_name:
