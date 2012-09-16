@@ -187,32 +187,38 @@ def receiveEmail(request):
         link = None
         email.attachments.create(link=link)
 
-    #This is for a new post
-    ###########################################
-    ccs_string = email.text.split('\n')[0]
-    if "r#" in ccs_string:
-        ccs_string = ccs_string.replace("r#", "")
-    else:
-        ccs_string = None
-
-    sender = User.objects.get_or_create(email = email.sender)[0]
-    print ccs_string
-
-    contacts = parseContacts(sender , ccs_string)
-    print contacts
-    post = generatePost(email, sender, contacts)
-    print post
-    
-    renderPost(sender, post)
-    for contact in contacts:
-        renderPost(contact, post)
+    if "info" in email.to:
+        #This is for a new post
+        ccs_string = email.text.split('\n')[0]
+        if "r#" in ccs_string:
+            ccs_string = ccs_string.replace("r#", "")
+        else:
+            ccs_string = None
+            
+            sender = User.objects.get_or_create(email = email.sender)[0]
+            print ccs_string
+            
+            contacts = parseContacts(sender , ccs_string)
+            print contacts
+            post = generatePost(email, sender, contacts)
+            print post
+            
+            renderPost(sender, post)
+            for contact in contacts:
+                renderPost(contact, post)
+    to_groups = re.match('P(\d+)', email.to)
+    if to_groups:
+        post = Post.objects.get(id = to_groups.group(1))
+        sender = User.objects.get_or_create(email = email.sender)[0]
+        renderComment(sender, post)
+        
     ##
-
+                
     #Comment
     """
     renderComment(sender, post)
     for contact in contacts:
-        renderComment(contact, post)
+    renderComment(contact, post)
     """
     return HttpResponse()
 
