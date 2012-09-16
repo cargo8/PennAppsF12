@@ -29,7 +29,8 @@ def signup(request):
 def login(request):
     return render_to_response('login.html')
 
-def sendPostEmail(request):
+def renderEmail(from_email, receiver_email, subject, post, commment = None):
+#def sendPostEmail(request):
 
     pref1 = EmailPreferences()
     pref1.save()
@@ -37,13 +38,13 @@ def sendPostEmail(request):
     pref2.save()
 
     user1 = User(first_name = 'Jason', last_name = 'Mow', activated = True, email = 'jason.mow@gmail.com', email_preferences = pref1)
-    user1.save()
+    #user1.save()
 
     user2 = User(first_name = 'Ron', last_name = 'Weasley', activated = True, email = 'jason@jasonmow.com', email_preferences = pref2)
-    user2.save()
+    #user2.save()
     
     post = Post(author = user1, subject = 'Testing out Emailr Templates', text = 'Hey I just want to test that this template works', likes = 0)
-    post.save()
+    #gpost.save()
 
     hdr = SmtpApiHeader.SmtpApiHeader()
     # The list of addresses this message will be sent to
@@ -78,7 +79,7 @@ def sendPostEmail(request):
 
     msg = EmailMultiAlternatives(subject, text_content, fromEmail, [toEmail], headers={"X-SMTPAPI": hdr.asJSON()})
     msg.attach_alternative(html, "text/html")
-    #msg.send()
+    msg.send()
 
     c = RequestContext(request, {
 
@@ -127,19 +128,18 @@ def receiveEmail(request):
     email.save()
 
     for i in range(1,attachments+1):
-            attachment = request.FILES['attachment%d' % i]
-            #Use filepicker.io file = attachment.read()
-            link = None
-            email.attachments.create(link=link)
-    else:
-            print "F*CK THIS"
+        attachment = request.FILES['attachment%d' % i]
+        #Use filepicker.io file = attachment.read()
+        link = None
+        email.attachments.create(link=link)
 
-    sender = User.objects.get_or_create(email = email.sender)
-    sender.save()
-
-    contacts = parseContacts(sender, email.cc)
-    post = generatePost(email, contacts)
-    # sendPostEmail(post)
+    #This is for a new post
+    ccs_string = email.text.split('\n')[0]
+    if "r#" in ccs_string:
+        ccs_string = ccs_string.replace("r#", "")
+    sender = User.objects.get_or_create(email = email.lower())
+    contacts = parseContacts(sender , ccs_string)
+    post = generatePost(email, sender, contacts)
     return HttpResponse()
 
 # @params:
@@ -150,6 +150,8 @@ def receiveEmail(request):
 #           bobby bo <hhaf@adfads.com>, john <email@gmail.com>
 # @does:
 #   Adds contacts to user
+#@returns : all recipients
+
 def parseContacts(user, ccs_string):
     contacts = re.findall('([a-zA-Z]+)(\s[a-zA-Z]+)?\s+<(([^<>,;"]+|".+")+)>(,\s+)?', ccs_string)
     recipients = []
@@ -179,9 +181,9 @@ def parseContacts(user, ccs_string):
     return recipients
 
 # generates a post out of the email and its recipients
-def generatePost(email, recipients):
+def generatePost(email, sender, recipients):
     post = Post()
-    post.author = User.objects.get(email = email.sender)
+    post.author = sender
     post.recipients = recipients
     post.subject = email.subject
 
@@ -206,5 +208,4 @@ def generatePost(email, recipients):
       post.instance.content.add(cnt)
 
     post.likes = 0
-    post.timestamp = email.timestamp
     return post
