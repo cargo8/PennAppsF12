@@ -128,7 +128,7 @@ def receiveEmail(request):
             link = None
             email.attachments.create(link=link)
     else:
-            print "FUCK THIS"
+            print "F*CK THIS"
     contacts = None #parseContacts(None, None)
     #post = generatePost(email, contacts)
     return HttpResponse()
@@ -145,7 +145,16 @@ def parseContacts(user, ccs_string):
     contacts = re.findall('([a-zA-Z]+)(\s[a-zA-Z]+)?\s+<(([^<>,;"]+|".+")+)>(,\s+)?', ccs_string)
     for contact in contacts:
         for i in range(len(contact)):
-            contact_user = User.objects.get_or_create(email = contact[2].lower(), first_name = contact[0], last_name = contact[1])[0]
+            c_fname = contact_user[0]
+            c_lname = c_email = ""
+            for i in range(1, len(contact_user)):
+                if "@" in contact_user[i]:
+                    c_email = contact_user[i]
+                    break
+                c_lname += contact_user[i] + " "
+            c_lname = c_lname.strip()
+            
+            contact_user = User.objects.get_or_create(email = c_email.lower(), first_name = c_fname, last_name = c_lname)[0]
             contact_user.save()
             contact = user.instance.contacts.get_or_create(user = contact_user)
             contact.save()
