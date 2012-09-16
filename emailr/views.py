@@ -187,6 +187,7 @@ def renderPost(recipient, post):
     msg = EmailMultiAlternatives(subject, text_content, fromEmail, [toEmail], headers={"Reply-To" : replyToEmail, "X-SMTPAPI": hdr.asJSON()})
     msg.attach_alternative(html, "text/html")
     msg.send()
+    print "Sent An email"
     
 
 def renderComment(recipient, comment):
@@ -207,6 +208,7 @@ def renderComment(recipient, comment):
     msg = EmailMultiAlternatives(comment.post.subject, comment.text, fromEmail, [toEmail], headers={"Reply-To" : replyToEmail, "X-SMTPAPI": hdr.asJSON()})
     msg.attach_alternative(html, "text/html")
     msg.send()
+    print "Sent A comment"
 
 
 @require_POST
