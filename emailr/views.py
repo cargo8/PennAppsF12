@@ -222,7 +222,8 @@ def receiveEmail(request):
             contacts = post.recipients + post.author
             for contact in contacts:
                 renderComment(contact, post)
-        
+    except Exception as e:
+        print e.message
     return HttpResponse()
 
 # @params:
