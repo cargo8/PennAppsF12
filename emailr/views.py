@@ -102,10 +102,7 @@ def renderPost(recipient, post):
 
     msg = EmailMultiAlternatives(subject, text_content, fromEmail, [toEmail], headers={"X-SMTPAPI": hdr.asJSON()})
     msg.attach_alternative(html, "text/html")
-    #msg.send()
-
-    c = RequestContext(request, inputs)
-    return render_to_response(template, c)
+    msg.send()
 
 @require_POST
 @csrf_exempt 
