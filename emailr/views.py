@@ -66,7 +66,7 @@ def renderPost(recipient, post):
     links = []
     files = []
 
-    for attachment in post.attachments:
+    for attachment in post.content.all():
         if attachment.link_type == attachment.PICTURE:
             pictures.append(attachment)
         elif attachment.link_type == attachment.WEBSITE:
