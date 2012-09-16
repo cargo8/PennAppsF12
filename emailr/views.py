@@ -168,7 +168,7 @@ def renderPost(recipient, post):
     elif len(pictures) == 1:
         template = 'one_img_post.html'
         inputs['img1'] = pictures[0]
-        print pictures[0].url
+        print pictures[0].link
         inputs['other_attachments'] = links + files
         print "loading one image"
     elif len(links) > 0:
