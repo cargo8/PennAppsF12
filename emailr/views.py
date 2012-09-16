@@ -153,30 +153,35 @@ def receiveEmail(request):
 #@returns : all recipients
 
 def parseContacts(user, ccs_string):
-    contacts = re.findall('([a-zA-Z]+)(\s[a-zA-Z]+)?\s+<(([^<>,;"]+|".+")+)>(,\s+)?', ccs_string)
+##    contacts = re.findall('([a-zA-Z]+)(\s[a-zA-Z]+)?\s+<(([^<>,;"]+|".+")+)>(,\s+)?', ccs_string)
+##    recipients = []
+##
+##    for contact in contacts:
+##        for i in range(len(contact)):
+##            c_fname = contact_user[0]
+##            c_lname = c_email = ""
+##            for i in range(1, len(contact_user)):
+##                if "@" in contact_user[i]:
+##                    c_email = contact_user[i]
+##                    break
+##                c_lname += contact_user[i] + " "
+##            c_lname = c_lname.strip()
+    contacts = re.findall('(([^, ]+)(\s*,\s*)?)', ccs_string)
     recipients = []
 
     for contact in contacts:
-        for i in range(len(contact)):
-            c_fname = contact_user[0]
-            c_lname = c_email = ""
-            for i in range(1, len(contact_user)):
-                if "@" in contact_user[i]:
-                    c_email = contact_user[i]
-                    break
-                c_lname += contact_user[i] + " "
-            c_lname = c_lname.strip()
+        c_email = contact[1]
            
-            # find or create user from parsed info 
-            contact_user = User.objects.get_or_create(email = c_email.lower(), first_name = c_fname, last_name = c_lname)[0]
-            contact_user.save()
-            
-            # add parsed user to recipient list
-            recipients.append(contact_user)
+        # find or create user from parsed info 
+        contact_user = User.objects.get_or_create(email = c_email.lower())[0]
+        contact_user.save()
+        
+        # add parsed user to recipient list
+        recipients.append(contact_user)
 
-            # add new contact user to sender's contacts
-            contact = user.instance.contacts.get_or_create(user = contact_user)
-            contact.save()
+        # add new contact user to sender's contacts
+        contact = user.instance.contacts.get_or_create(user = contact_user)
+        contact.save()
 
     return recipients
 
