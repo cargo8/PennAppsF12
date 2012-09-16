@@ -1,9 +1,9 @@
-#from django.http import HttpResponse, Http404, HttpResponseRedirect, HttpRequest
-#from django.template import Context, RequestContext, TemplateDoesNotExist
-#from django.template.loader import render_to_string
-#from django.shortcuts import render_to_response, redirect
-#from django.views.generic.simple import direct_to_template
-#import SmtpApiHeader
+from django.http import HttpResponse, Http404, HttpResponseRedirect, HttpRequest
+from django.template import Context, RequestContext, TemplateDoesNotExist
+from django.template.loader import render_to_string
+from django.shortcuts import render_to_response, redirect
+from django.views.generic.simple import direct_to_template
+import SmtpApiHeader
 import json
 import re
 from django.core.mail import EmailMultiAlternatives
