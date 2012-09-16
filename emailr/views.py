@@ -224,6 +224,7 @@ def parseContacts(user, ccs_string):
 def generatePost(email, sender, recipients):
     post = Post()
     post.author = sender
+    post.save()
     post.recipients = recipients
     post.subject = email.subject
 
@@ -239,13 +240,11 @@ def generatePost(email, sender, recipients):
       link = att.link
       ext = link.split(".")[-1].lower()
       cnt = Content()
+      cnt.link = link
       if ext in ["jpg", "png", "gif"]:
-        cnt.link = None
-        cnt.picture = link
+        cnt.link_type = cnt.PICTURE
       else:
-        cnt.link = link
-        cnt.picture = None
-      post.instance.content.add(cnt)
+        cnt.link_type = cnt.FILE
+    post.instance.content.add(cnt)
 
-    post.likes = 0
-    return post
+    return post.save()[0]
