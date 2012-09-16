@@ -6,8 +6,8 @@ class User(models.Model):
     friends = models.ManyToManyField('self')
     email = models.EmailField()
     profile_picture = models.URLField()
-    first_name = models.CharField(max_length=50)
-    last_name = models.CharField(max_length=50)
+    first_name = models.CharField(max_length=50, null=True)
+    last_name = models.CharField(max_length=50, null=True)
     activated = models.BooleanField(default=False)
 
 class MailingListGroup(models.Model):

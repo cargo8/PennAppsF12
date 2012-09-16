@@ -69,6 +69,9 @@ def login(request):
 def home(request):
     c = RequestContext(request, {'request': request})    
     return render_to_response('index.html', c)
+    
+def talks(request):
+    return render_to_response("talks.html")
 
 def testRender(request):
     return render_to_response('one_img_post.html')
@@ -83,11 +86,11 @@ def renderPost(recipient, post):
 
     # Specify that this is an initial contact message
     hdr.setCategory("initial")  
-    replyToEmail = "p" + str(comment.post.id) + "@emailr.co"
+    replyToEmail = "p" + str(post.id) + "@emailr.co"
     hdr.setReplyTo(replyToEmail)
 
     fromEmail =  "info@emailr.co"
-    toEmail = recipent.email
+    toEmail = recipient.email
 
     # text is your plain-text email
     # html is your html version of the email
@@ -96,7 +99,7 @@ def renderPost(recipient, post):
 
     subject = post.subject
     
-    is_author = recipent == post.author
+    is_author = recipient == post.author
 
     name =  post.author.first_name + " " + post.author.last_name
     text_content = name + " has shared something with you using Emailr:\n\n" + post.text
@@ -106,7 +109,7 @@ def renderPost(recipient, post):
     links = []
     files = []
 
-    for attachment in post.attachments:
+    for attachment in post.content.all():
         if attachment.link_type == attachment.PICTURE:
             pictures.append(attachment)
         elif attachment.link_type == attachment.WEBSITE:
@@ -115,7 +118,7 @@ def renderPost(recipient, post):
             files.append(attachment)
 
     template = None
-    inputs = {'post' : post, 'recipent' : recipent, 'is_author' : is_author}
+    inputs = {'post' : post, 'recipent' : recipient, 'is_author' : is_author}
     if len(pictures) > 1:
         template = 'two_img_post.html'
         inputs['img1'] = pictures[0]
@@ -136,16 +139,13 @@ def renderPost(recipient, post):
         inputs['other_attachments'] = files
 
 
-        #
+    print str(toEmail)
 
     html = render_to_string(template, inputs);
 
     msg = EmailMultiAlternatives(subject, text_content, fromEmail, [toEmail], headers={"X-SMTPAPI": hdr.asJSON()})
     msg.attach_alternative(html, "text/html")
-    #msg.send()
-
-    c = RequestContext(request, inputs)
-    return render_to_response(template, c)
+    msg.send()
 
 def renderComment(recipient, comment):
     #Check if recipent = comment.author
@@ -157,8 +157,8 @@ def receiveEmail(request):
     output = {}
 
     data = request.POST
-    print data
-    
+    for key in data.keys():
+        print key
     attachments = 0
 
     if 'from' in data.keys():
@@ -188,11 +188,11 @@ def receiveEmail(request):
     if 'subject' in data.keys():
         output['subject'] = data['subject']
 
-
     email = Email(**output)
     email.save()
 
-    for i in range(1,attachments+1):
+    for i in range(1,int(attachments)
+        +1):
         attachment = request.FILES['attachment%d' % i]
         #Use filepicker.io file = attachment.read()
         link = None
@@ -203,9 +203,16 @@ def receiveEmail(request):
     ccs_string = email.text.split('\n')[0]
     if "r#" in ccs_string:
         ccs_string = ccs_string.replace("r#", "")
-    sender = User.objects.get_or_create(email = email)[0]
+    else:
+        ccs_string = None
+
+    sender = User.objects.get_or_create(email = email.sender)[0]
+    print ccs_string
+
     contacts = parseContacts(sender , ccs_string)
+    print contacts
     post = generatePost(email, sender, contacts)
+    print post
     
     renderPost(sender, post)
     for contact in contacts:
@@ -244,14 +251,17 @@ def parseContacts(user, ccs_string):
 ##                    break
 ##                c_lname += contact_user[i] + " "
 ##            c_lname = c_lname.strip()
+    if ccs_string is None:
+        return None
     contacts = re.findall('(([^, ]+)(\s*,\s*)?)', ccs_string)
     recipients = []
 
     for contact in contacts:
+        print contact
         c_email = contact[1]
            
         # find or create user from parsed info 
-        contact_user = user.contacts.get_or_create(email = c_email.lower())[0]
+        contact_user = user.contacts.get_or_create(email = c_email)[0]
         contact_user.save()
         
         # add parsed user to recipient list

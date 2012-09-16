@@ -26,10 +26,15 @@
 	  </div>
 		<div class="form-actions">
 		  <a href="/"><button type="button" class="btn">Cancel</button></a>
-		  <button type="submit" class="btn btn-primary">Login &raquo;</button>
+		  <button id="login" class="btn btn-primary">Login &raquo;</button>
 		</div>
 	  
 	</form>
+   <script>
+      $("#login").click(function() {
+         window.location.replace("/talks/");
+      });
+   </script>
   </p>
 </div>
       
