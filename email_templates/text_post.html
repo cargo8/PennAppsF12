@@ -25,7 +25,7 @@
 									                                    <span class="author" style="text-align:right;">{{ post.author.first_name }} {{ post.author.last_name }}{% if is_author %} (You){% endif %}</span>
 									                                    <p>{{ post.text }}</p>
 									                                    
-									                                    {% ifequals liked 0 %}
+									                                    {% ifequal liked 0 %}
 									                                    <img src="/static/star.png" class="starOne"/>
 									                                    {% else %}
 									                                    <img src="/static/star1.png" class="starOne"/>
