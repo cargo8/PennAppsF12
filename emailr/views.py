@@ -114,6 +114,7 @@ def receiveEmail(request):
 
     if 'from' in data.keys():
         if type(data['from']) is list:
+            print data['from']
             output['sender'] = "; ".join(data['from'])
         else:
             output['sender'] = data['from']
