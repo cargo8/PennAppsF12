@@ -148,7 +148,7 @@ def renderPost(recipient, post):
     template = None
     inputs = {'post' : post, 'recipent' : recipient, 'is_author' : is_author}
 
-    if recipient in post.likes:
+    if recipient in post.likes.all():
         inputs['liked'] = 1
     else:
         inputs['liked'] = 0
