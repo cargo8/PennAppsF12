@@ -6,10 +6,11 @@
 #import SmtpApiHeader
 import json
 import re
-#from django.core.mail import EmailMultiAlternatives
-#from emailr.models import *
-#from django.views.decorators.http import require_POST
-#from emailr.forms import TryItForm
+from django.core.mail import EmailMultiAlternatives
+from emailr.models import *
+from django.views.decorators.http import require_POST
+from emailr.forms import *
+from django.views.decorators.csrf import csrf_exempt
 
 def index(request):
     if request.method == 'POST':
@@ -24,6 +25,9 @@ def index(request):
 
 def signup(request):
     return render_to_response('signup.html')
+
+def login(request):
+    return render_to_response('login.html')
 
 def renderEmail(request):
 
@@ -78,21 +82,55 @@ def renderEmail(request):
     return render_to_response('email.html', c)
 
 @require_POST
+@csrf_exempt 
 def receiveEmail(request):
-    print request
-    if 'from' in request.POST.keyset():
-        request.POST['sender'] = request.POST['from']
-        del request.POST['from']
-    form = EmailForm(request.POST)
-    if form.is_valid():
-        form.instance.save()
-        for i in range(1,form.cleaned_data['attachments']+1):
+    output = {}
+
+    data = request.POST
+    print data
+    
+    attachments = 0
+
+    if 'from' in data.keys():
+        if type(data['from']) is list:
+            output['sender'] = "; ".join(data['from'])
+        else:
+            output['sender'] = data['from']
+    if 'attachments' in data.keys():
+        attachments = data['attachments']
+        if type(attachments) is list:
+            attachments = attachments[0]
+
+    if 'to' in data.keys():
+        if type(data['to']) is list:
+            output['to'] = "; ".join(data['to'])
+        else:
+            output['to'] = data['to']
+    if 'cc' in data.keys():
+        output['cc'] = "; ".join(data['cc'])
+    if 'text' in data.keys():
+        output['text'] = data['text']
+
+    if 'headers' in data.keys():
+        output['headers'] = data['headers']
+    if 'html' in data.keys():
+        output['html'] = data['html']
+    if 'subject' in data.keys():
+        output['subject'] = data['subject']
+
+
+    email = Email(**output)
+    email.save()
+
+    for i in range(1,attachments+1):
             attachment = request.FILES['attachment%d' % i]
             #Use filepicker.io file = attachment.read()
             link = None
-            form.instance.attachments.create(link=link)
+            email.attachments.create(link=link)
+    else:
+            print "FUCK THIS"
     contacts = None #parseContacts(None, None)
-    #post = generatePost(form, contacts)
+    #post = generatePost(email, contacts)
     return HttpResponse()
 
 # @params:
