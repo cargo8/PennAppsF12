@@ -1,9 +1,9 @@
-#from django.http import HttpResponse, Http404, HttpResponseRedirect, HttpRequest
-#from django.template import Context, RequestContext, TemplateDoesNotExist
-#from django.template.loader import render_to_string
-#from django.shortcuts import render_to_response, redirect
-#from django.views.generic.simple import direct_to_template
-#import SmtpApiHeader
+from django.http import HttpResponse, Http404, HttpResponseRedirect, HttpRequest
+from django.template import Context, RequestContext, TemplateDoesNotExist
+from django.template.loader import render_to_string
+from django.shortcuts import render_to_response, redirect
+from django.views.generic.simple import direct_to_template
+import SmtpApiHeader
 import json
 import re
 from django.core.mail import EmailMultiAlternatives
@@ -29,35 +29,36 @@ def signup(request):
 def login(request):
     return render_to_response('login.html')
 
-def renderEmail(request):
+def sendPostEmail(request):
+
+    pref1 = EmailPreferences()
+    pref1.save()
+    pref2 = EmailPreferences()
+    pref2.save()
+ 
+    user1 = User(first_name = 'Jason', last_name = 'Mow', activated = True, email = 'jason.mow@gmail.com',)
+    user1.save()
+
+    user2 = User(first_name = 'Ron', last_name = 'Weasley', activated = True, email = 'jason@jasonmow.com', email_preferences = EmailPreferences())
+    user2.save()
+    
+    post = Post(author = user1, subject = 'Testing out Emailr Templates', text = 'Hey I just want to test that this template works', likes = 0)
+    post.save()
 
     hdr = SmtpApiHeader.SmtpApiHeader()
     # The list of addresses this message will be sent to
-    receiver = ['jason.mow@gmail.com', 'jason@jasonmow.com']
+    #TODO: extract recipient emails from User objects
+    recipients = post.recipients
 
-    # Another subsitution variable
-    names = ['Jason', 'Jason']
-
-    # Set all of the above variables
-    hdr.addTo(receiver)
-    hdr.addSubVal('-name-', names)
+    hdr.addTo(recipients)
 
     # Specify that this is an initial contact message
     hdr.setCategory("initial")
 
-    # Enable a text footer and set it
-    hdr.addFilterSetting('footer', 'disable', 1)
-    # hdr.addFilterSetting('footer', "text/plain", "Thank you for your business")
-
-    # fromEmail is your email
     # toEmail is recipient's email address
     # For multiple recipient e-mails, the 'toEmail' address is irrelivant
     fromEmail =  'info@emailr.co'
-    toEmail = 'info@emailr.co'
-
-    # Create message container - the correct MIME type is multipart/alternative.
-    # Using Django's 'EmailMultiAlternatives' class in this case to create and send.
-    # Create the body of the message (a plain-text and an HTML version).
+    # toEmail = 'info@emailr.co'
 
     # text is your plain-text email
     # html is your html version of the email
@@ -65,11 +66,13 @@ def renderEmail(request):
     # email will be displayed
 
     subject = 'Hi <-name->, you have been sent an emailr'
-
-    text_content = 'Hi -name-!\nHow are you?\n'
+    
+    name =  post.author.first_name + " " + post.author.last_name
+    text_content = name + " has shared something with you using Emailr:\n\n" + post.text
+    text_content += "\n\n\nIf you would like to comment on this post just reply to this email."
 
     html = render_to_string('postcard.html', {
-
+        
     });
 
     msg = EmailMultiAlternatives(subject, text_content, fromEmail, [toEmail], headers={"X-SMTPAPI": hdr.asJSON()})
@@ -130,7 +133,8 @@ def receiveEmail(request):
     else:
             print "FUCK THIS"
     contacts = None #parseContacts(None, None)
-    #post = generatePost(email, contacts)
+    # post = generatePost(email, contacts)
+    # sendPostEmail(post)
     return HttpResponse()
 
 # @params:
@@ -157,8 +161,7 @@ def generatePost(email, recipients):
     post.recipients = recipients
     post.subject = email.subject
 
-    # refine the email's message
-    post.text = ""
+    post.text = email.text
     #lines = email.text.split("\n")
     lines = re.split(r'[\n\r]+', email.text)
     for line in lines:
