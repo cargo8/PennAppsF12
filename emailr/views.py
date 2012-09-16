@@ -236,7 +236,7 @@ def generatePost(email, sender, recipients):
         post.text += line
 
     # extract images/links from Attachments
-    for att in email.attachments.all:
+    for att in email.instance.attachments:
       link = att.link
       ext = link.split(".")[-1].lower()
       cnt = Content()
