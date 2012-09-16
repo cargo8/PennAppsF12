@@ -7,7 +7,7 @@ import random
 def save_image(instream):
 	conn = S3Connection()
 	bucket = conn.lookup('emailr_file_storage')
-	key(bucket)
+	k = Key(bucket)
 	k.key = str(time.localtime()) + str(random.randint(0,5000))
 	key.send_file(instream)
 	return key.generate_url(100000000)

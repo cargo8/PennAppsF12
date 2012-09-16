@@ -32,8 +32,6 @@ def index(request):
     return render_to_response('index.html', {'form': form, 'request': request})
 
 def signup(request):
-    if request.user.is_authenticated():
-        return HttpResponseRedirect('/home/')
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
@@ -42,9 +40,6 @@ def signup(request):
             u.save()
             u.auth = new_user
             u.save()
-            
-            user = authenticate(username=request.POST['username'], password=request.POST['password1']) 
-            auth.login(request, user)
             return redirect(register)
     else:
         form = UserCreationForm()
@@ -84,7 +79,7 @@ def register(request):
 
             user.activated = True
             user.save()
-            return render_to_response("home.html")
+            return render_to_response("index.html", {'request':request})
     else:
         form = ProfileForm()
         
@@ -201,9 +196,7 @@ def receiveEmail(request):
         else:
             output['sender'] = data['from']
     if 'attachments' in data.keys():
-        print 1
         attachments = data['attachments']
-        print attachments
         if type(attachments) is list:
             attachments = attachments[0]
 
@@ -223,7 +216,6 @@ def receiveEmail(request):
         output['html'] = data['html']
     if 'subject' in data.keys():
         output['subject'] = data['subject']
-    print 1
     try:
         email = Email(**output)
         email.save()
