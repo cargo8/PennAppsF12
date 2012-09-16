@@ -1,3 +1,16 @@
-body {
-    background-image: url('bg.png');
+.btn-primary {
+  background-color: hsl(133, 84%, 39%) !important;
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#13e541", endColorstr="#0fb634");
+  background-image: -khtml-gradient(linear, left top, left bottom, from(#13e541), to(#0fb634));
+  background-image: -moz-linear-gradient(top, #13e541, #0fb634);
+  background-image: -ms-linear-gradient(top, #13e541, #0fb634);
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #13e541), color-stop(100%, #0fb634));
+  background-image: -webkit-linear-gradient(top, #13e541, #0fb634);
+  background-image: -o-linear-gradient(top, #13e541, #0fb634);
+  background-image: linear-gradient(#13e541, #0fb634);
+  border-color: #0fb634 #0fb634 hsl(133, 84%, 36.5%);
+  color: #fff !important;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.16);
+  -webkit-font-smoothing: antialiased;
 }
