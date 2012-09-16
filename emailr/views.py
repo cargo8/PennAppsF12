@@ -148,6 +148,13 @@ def renderPost(recipient, post):
     template = None
     inputs = {'post' : post, 'recipent' : recipient, 'is_author' : is_author}
 
+    if recipient in post.likes:
+        inputs['liked'] = 1
+    else:
+        inputs['liked'] = 0
+
+    inputs['likes'] = len(post.likes)
+
     if len(pictures) > 1:
         template = 'two_img_post.html'
         inputs['img1'] = pictures[0]
