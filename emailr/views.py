@@ -363,13 +363,11 @@ def parseContacts(user, ccs_string):
 
 # generates a post out of the email and its recipients
 def generatePost(email, sender, recipients):
-    post = Post()
-    post.author = sender
+    post = Post.objects.create(author = sender, recipients = recipients, subject =  email.subject)
     post.save()
-    post.recipients = recipients
-    post.subject = email.subject
 
     #lines = email.text.split("\n")
+    post.text = ""
     lines = re.split(r'[\n\r]+', email.text)
     for line in lines:
         if not "r#" in line and not ">" in line[:2]:
