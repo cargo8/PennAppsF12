@@ -112,6 +112,7 @@ def testRender(request):
 #######################################################
 
 def renderPost(recipient, post):
+    print "rendering post......."
     #Check if recipent = post.author
     hdr = SmtpApiHeader.SmtpApiHeader()
 
@@ -119,7 +120,7 @@ def renderPost(recipient, post):
     hdr.setCategory("initial")  
     replyToEmail = "p" + str(post.id) + "@emailr.co"
     
-    fromEmail =  "info@emailr.co"
+    fromEmail =  "groups@emailr.co"
     toEmail = recipient.email.strip()
 
     # text is your plain-text email
@@ -190,14 +191,16 @@ def renderPost(recipient, post):
     msg = EmailMultiAlternatives(subject, text_content, fromEmail, [toEmail], headers={"Reply-To" : replyToEmail, "X-SMTPAPI": hdr.asJSON()})
     msg.attach_alternative(html, "text/html")
     msg.send()
+    print "Sent An email"
     
 
 def renderComment(recipient, comment):
+    print "rendering comment......."
     hdr = SmtpApiHeader.SmtpApiHeader()
     hdr.setCategory("initial")  
     replyToEmail = "p" + str(comment.post.id) + "c" + str(comment.id) + "@emailr.co"
     
-    fromEmail =  "info@emailr.co"
+    fromEmail =  "groups@emailr.co"
     toEmail = recipient.email.strip()
 
     is_author = recipient == comment.author
@@ -210,6 +213,7 @@ def renderComment(recipient, comment):
     msg = EmailMultiAlternatives(comment.post.subject, comment.text, fromEmail, [toEmail], headers={"Reply-To" : replyToEmail, "X-SMTPAPI": hdr.asJSON()})
     msg.attach_alternative(html, "text/html")
     msg.send()
+    print "Sent A comment"
 
 
 @require_POST
@@ -324,6 +328,9 @@ def receiveEmail(request):
             for line in email.text.split('\n'):
                 if '>' not in line[:2]:
                     comment_text += line
+            cut = comment_text.find("On Sun")
+            if cut > 0:
+                comment_text = comment_text[:cut]
             comment = Comment.objects.create(author = sender, text = comment_text, post = post)
             comment.save()
             if len(content) > 0:
