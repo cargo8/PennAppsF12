@@ -246,5 +246,5 @@ def generatePost(email, sender, recipients):
       else:
         cnt.link_type = cnt.FILE
       post.content.add(cnt)
-
-    return post.save()[0]
+    post.save()
+    return post
