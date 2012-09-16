@@ -301,8 +301,8 @@ def receiveEmail(request):
             if len(content) > 0:
                 comment.content = content
             comment.save()
-            
-            contacts = post.recipients + post.author
+
+            contacts = post.recipients.all() + post.author
             for contact in contacts:
                 renderComment(contact, comment)
     except Exception as e:
