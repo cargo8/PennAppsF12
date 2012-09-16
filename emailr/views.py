@@ -388,7 +388,7 @@ def generatePost(email, sender, recipients):
 
     #lines = email.text.split("\n")
     post.text = ""
-    lines = re.split(r'[\n\r]+', email.text)
+    lines = re.split(r'[\n\r>]+', email.text)
     for line in lines:
         if not "r#" in line and not ">" in line[:2]:
             post.text += line
