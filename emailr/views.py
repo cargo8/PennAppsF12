@@ -65,9 +65,13 @@ def login(request):
     c = RequestContext(request, {'form': form})
     return render_to_response("login.html", c)
 
-#TODO
+def logout(request):
+    auth.logout(request)
+    form = TryItForm()
+    return render_to_response('index.html', {'form': form, 'msg': 'You have successfully logged out.'})
+
 def home(request):
-    c = RequestContext(request, {'request': request})    
+    c = RequestContext(request, {'request': request})
     return render_to_response('index.html', c)
     
 def talks(request):
