@@ -77,22 +77,22 @@ def renderPost(recipient, post):
     template = None
     inputs = {'post' : post, 'recipent' : recipent, 'is_author' : is_author}
     if len(pictures) > 1:
-        template = 'two-img-post.html'
+        template = 'two_img_post.html'
         inputs['img1'] = pictures[0]
         inputs['img2'] = pictures[1]
         inputs['other_attachments'] = pictures[2:] + links + files
     elif len(pictures) == 1:
-        template = 'one-img-post.html'
+        template = 'one_img_post.html'
         inputs['img1'] = pictures[0]
         inputs['other_attachments'] = links + files
     elif len(links) > 0:
-        template = 'link-post.html'
+        template = 'link_post.html'
         if len(links) > 1:
             inputs['other_attachments'] = links[1:] + files
         else:
             inputs['other_attachments'] = files
     else:
-        template = 'text-post.html'
+        template = 'text_post.html'
         inputs['other_attachments'] = files
 
 
