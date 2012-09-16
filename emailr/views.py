@@ -161,7 +161,7 @@ def receiveEmail(request):
 
     sender = User.objects.get_or_create(email = email.sender)[0]
     print ccs_string
-    
+
     contacts = parseContacts(sender , ccs_string)
     print contacts
     post = generatePost(email, sender, contacts)
@@ -210,6 +210,7 @@ def parseContacts(user, ccs_string):
     recipients = []
 
     for contact in contacts:
+        print contact
         c_email = contact[1]
            
         # find or create user from parsed info 
