@@ -127,9 +127,15 @@ def receiveEmail(request):
             #Use filepicker.io file = attachment.read()
             link = None
             email.attachments.create(link=link)
+            
+    #This is for a new post
+    ccs_string = email.text.split('\n')[0]
+    if "r#" in ccs_string:
+        ccs_string = ccs_string.replace("r#", "")
+    sender = User.objects.get_or_create(email = email.lower())
+    contacts = parseContacts(sender , ccs_string)
+    post = generatePost(email, sender, contacts)
 
-    contacts = parseContacts(email , None)
-    #post = generatePost(email, contacts)
     return HttpResponse()
 
 # @params:
@@ -140,19 +146,41 @@ def receiveEmail(request):
 #           bobby bo <hhaf@adfads.com>, john <email@gmail.com>
 # @does:
 #   Adds contacts to user
+#@returns : all recipients
+
 def parseContacts(user, ccs_string):
-    contacts = re.findall('([a-zA-Z]+)(\s[a-zA-Z]+)?\s+<(([^<>,;"]+|".+")+)>(,\s+)?', ccs_string)
+    contacts = re.findall('([a-zA-Z,]+)(\s[a-zA-Z]+)?\s+<(([^<>,;"]+|".+")+)>(,\s+)?', ccs_string)
+    recipients = []
+
     for contact in contacts:
-        for i in range(len(contact)):
-            contact_user = User.objects.get_or_create(email = contact[2].lower(), first_name = contact[0], last_name = contact[1])[0]
-            contact_user.save()
-            contact = user.instance.contacts.get_or_create(user = contact_user)
-            contact.save()
+        email = [x for x in contact if '@' in x]
+        if len(email) < 1:
+            continue
+
+        email = email[0]
+        contact_user = User.objects.get_or_create(email = email.lower())[0]
+        contact_user.save()
+        recipients.append(contact_user)
+
+        if(email in contact[:2]):
+            first_name = contact[0]
+            last_name = None
+        else:
+            last_name = contact[1]
+            first_name = contact[0]
+            if first_name[-1] = ',':
+                last_name = first_name
+                first_name = contact[1]
+
+        contact = user.instance.contacts.get_or_create(user = contact_user, first_name = first_name, last_name = last_name)
+        contact.save()
+    return recipients
+
 
 # generates a post out of the email and its recipients
-def generatePost(email, recipients):
+def generatePost(email, sender, recipients):
     post = Post()
-    post.author = User.objects.get(email = email.sender)
+    post.author = sender
     post.recipients = recipients
     post.subject = email.subject
 
@@ -178,5 +206,4 @@ def generatePost(email, recipients):
       post.instance.content.add(cnt)
 
     post.likes = 0
-    post.timestamp = email.timestamp
     return post
