@@ -197,12 +197,15 @@ def receiveEmail(request):
 
     sender = User.objects.get_or_create(email = email.sender)[0]
     print ccs_string
-
-    contacts = parseContacts(sender , ccs_string)
-    print contacts
-    post = generatePost(email, sender, contacts)
-    print post
-    
+    try:
+        contacts = parseContacts(sender , ccs_string)
+        print contacts
+        post = generatePost(email, sender, contacts)
+        print post
+    except Exception as e:
+            print e
+            import traceback
+            traceback.format_exc()
     renderPost(sender, post)
     for contact in contacts:
         renderPost(contact, post)
@@ -250,14 +253,10 @@ def parseContacts(user, ccs_string):
         c_email = contact[1]
            
         # find or create user from parsed info 
-        try:
-            contact_user = user.friends.get_or_create(email = c_email)[0]
-            contact_user.save()
-        except Exception as e:
-            print e
-            import traceback
-            traceback.format_exc()
-        print c_email
+        
+        contact_user = user.friends.get_or_create(email = c_email)[0]
+        contact_user.save()
+        
         # add parsed user to recipient list
         recipients.append(contact_user)
 
@@ -265,7 +264,6 @@ def parseContacts(user, ccs_string):
         contact = user.friends.get_or_create(user = contact_user)[0]
 
         contact.save()
-
     return recipients
 
 # generates a post out of the email and its recipients
