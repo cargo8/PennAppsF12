@@ -168,7 +168,7 @@ def renderPost(recipient, post):
     elif len(pictures) == 1:
         template = 'one_img_post.html'
         inputs['img1'] = pictures[0]
-        print pictures[0]
+        print pictures[0].url
         inputs['other_attachments'] = links + files
         print "loading one image"
     elif len(links) > 0:
@@ -235,7 +235,6 @@ def receiveEmail(request):
             #Use filepicker.io file = attachment.read()
             print "Before link"
             link = save_image(attachment)
-            print link
             email.attachments.create(link=link)
     except Exception as e:
         print 'a', e
