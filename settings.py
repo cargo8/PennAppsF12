@@ -141,9 +141,10 @@ LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'handlers': {
-        'mail_admins': {
+        'console': {
             'level': 'ERROR',
-            'class': 'django.utils.log.AdminEmailHandler'
+            'class': 'logging.StreamHandler',
+            'strm' : sys.stdout
         }
     },
     'loggers': {
