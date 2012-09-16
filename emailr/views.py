@@ -85,23 +85,25 @@ def receiveEmail(request):
     data = request.POST
     attachments = 0
 
-    if data['from']:
+    if 'from' in data.keys():
         output['sender'] = "; ".join(data['from'])
-    if data['attachments']:
+    if 'attachments' in data.keys():
         attachments = data['attachments']
         if type(attachments) is list:
             attachments = attachments[0]
 
-    if data['to']:
+    if 'to' in data.keys():
         output['to'] = "; ".join(data['to'])
-    if data['text']:
+    if 'cc' in data.keys():
+        output['cc'] = "; ".join(data['cc'])
+    if 'text' in data.keys():
         output['text'] = data['text']
 
-    if data['headers']:
+    if 'headers' in data.keys():
         output['headers'] = data['headers']
-    if data['html']:
+    if 'html' in data.keys():
         output['html'] = data['html']
-    if data['subject']:
+    if 'subject' in data.keys():
         output['subject'] = data['subject']
 
     print output
