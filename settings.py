@@ -144,7 +144,7 @@ LOGGING = {
         'console': {
             'level': 'ERROR',
             'class': 'logging.StreamHandler',
-            'strm' : sys.stdout
+            'stream' : sys.stdout
         }
     },
     'loggers': {
