@@ -10,12 +10,14 @@
 	<form class="form-horizontal" action="." method="post">
     {% csrf_token %}	
 	  <div class="control-group">
+	  	{{ form.email.errors }}
 	    <label class="control-label" for="email">Email:</label>
 	    <div class="controls">
 	      {{form.email }}
 	    </div>
 	  </div>
 
+	  	{{ form.password.errors }}
 	  <div class="control-group">
 	    <label class="control-label" for="password">Password:</label>
 	    <div class="controls">

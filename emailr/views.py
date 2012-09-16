@@ -5,6 +5,7 @@ from django.shortcuts import render_to_response, redirect
 from django.views.generic.simple import direct_to_template
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate
+from django.contrib import auth
 import SmtpApiHeader
 import json
 import re
@@ -19,6 +20,8 @@ from django.views.decorators.csrf import csrf_exempt
 #######################################################
 
 def index(request):
+    if request.user.is_authenticated:
+        return redirect(home)
     if request.method == 'POST':
         form = TryItForm(request.POST)
         if form.is_valid():
@@ -27,14 +30,18 @@ def index(request):
             return render_to_response('index.html', {'form': form})
     else:
         form = TryItForm()
-    return render_to_response('index.html', {'form': form})
+    return render_to_response('index.html', {'form': form, 'request': request})
 
 def signup(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
             new_user = form.save()
-            return redirect(login)
+            u = User.objects.get_or_create(email = request.POST['username'])[0]
+            u.save()
+            u.auth = new_user
+            u.save()
+            return redirect(register)
     else:
         form = UserCreationForm()
 
@@ -45,19 +52,27 @@ def signup(request):
 def login(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
-        user = authenticate(username=form['email'], password=form['password'])
+        user = authenticate(username=request.POST['email'], password=request.POST['password'])
         if user is not None:
-            redirect(home)
+            auth.login(request, user)
+            return redirect(home)
         else:
-            render_to_response('login.html', {'form':form})
+            return redirect(index)
+            #render_to_response('login.html', {'form':form})
     else:
         form = LoginForm()
 
     c = RequestContext(request, {'form': form})
     return render_to_response("login.html", c)
 
+def logout(request):
+    auth.logout(request)
+    form = TryItForm()
+    return render_to_response('index.html', {'form': form, 'msg': 'You have successfully logged out.'})
+
 def home(request):
-    pass
+    c = RequestContext(request, {'request': request})
+    return render_to_response('index.html', c)
     
 def talks(request):
     return render_to_response("talks.html")
@@ -77,7 +92,7 @@ def renderPost(recipient, post):
     hdr.setCategory("initial")  
     replyToEmail = "p" + str(post.id) + "@emailr.co"
     hdr.setReplyTo(replyToEmail)
-
+    print hdr
     fromEmail =  "info@emailr.co"
     toEmail = recipient.email
 
@@ -90,7 +105,8 @@ def renderPost(recipient, post):
     
     is_author = recipient == post.author
 
-    name =  post.author.first_name + " " + post.author.last_name
+    name =  "I dont like names" #post.author.first_name + " " + post.author.last_name
+
     text_content = name + " has shared something with you using Emailr:\n\n" + post.text
     text_content += "\n\n\nIf you would like to comment on this post just reply to this email."
 
@@ -108,6 +124,7 @@ def renderPost(recipient, post):
 
     template = None
     inputs = {'post' : post, 'recipent' : recipient, 'is_author' : is_author}
+
     if len(pictures) > 1:
         template = 'two_img_post.html'
         inputs['img1'] = pictures[0]
@@ -127,14 +144,14 @@ def renderPost(recipient, post):
         template = 'text_post.html'
         inputs['other_attachments'] = files
 
+    try:
+        html = render_to_string(template, inputs);
 
-    print str(toEmail)
-
-    html = render_to_string(template, inputs);
-
-    msg = EmailMultiAlternatives(subject, text_content, fromEmail, [toEmail], headers={"X-SMTPAPI": hdr.asJSON()})
-    msg.attach_alternative(html, "text/html")
-    msg.send()
+        msg = EmailMultiAlternatives(subject, text_content, fromEmail, [toEmail], headers={"X-SMTPAPI": hdr.asJSON()})
+        msg.attach_alternative(html, "text/html")
+        msg.send()
+    except Exception as e:
+        print e
 
 def renderComment(recipient, comment):
     #Check if recipent = comment.author
@@ -252,21 +269,15 @@ def parseContacts(user, ccs_string):
     recipients = []
 
     for contact in contacts:
-        print contact
         c_email = contact[1]
            
         # find or create user from parsed info 
-        contact_user = user.contacts.get_or_create(email = c_email)[0]
+        
+        contact_user = user.friends.get_or_create(email = c_email)[0]
         contact_user.save()
         
         # add parsed user to recipient list
         recipients.append(contact_user)
-
-        # add new contact user to sender's contacts
-        contact = user.contacts.get_or_create(user = contact_user)[0]
-
-        contact.save()
-
     return recipients
 
 # generates a post out of the email and its recipients
