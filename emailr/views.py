@@ -223,9 +223,12 @@ def receiveEmail(request):
         for i in range(1,int(attachments)+1):
             attachment = request.FILES['attachment%d' % i]
             #Use filepicker.io file = attachment.read()
+            print "Before link"
             link = save_image(attachment)
+            print link
             email.attachments.create(link=link)
     except Exception as e:
+        print 'a', e
         print e.message
     print 2
     if "info" in email.to:
