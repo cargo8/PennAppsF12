@@ -266,8 +266,16 @@ def receiveEmail(request):
             else:
                 ccs_string = None
             
-            contacts = parseContacts(sender , ccs_string)
-            post = generatePost(email, sender, contacts)
+            try:
+                contacts = parseContacts(sender , ccs_string)
+            except Exception as e:
+                print "contacts", e.message
+                return HttpResponse()
+            try:
+                post = generatePost(email, sender, contacts)
+            except Exception as e:
+                print "post", e.message
+                return HttpResponse()
             
             renderPost(sender, post)
             for contact in contacts:
@@ -353,7 +361,6 @@ def generatePost(email, sender, recipients):
     post.recipients = recipients
     post.subject = email.subject
 
-    post.text = email.text
     #lines = email.text.split("\n")
     lines = re.split(r'[\n\r]+', email.text)
     for line in lines:
