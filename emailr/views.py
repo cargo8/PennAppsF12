@@ -88,7 +88,7 @@ def renderPost(recipient, post):
     hdr.setCategory("initial")  
     replyToEmail = "p" + str(post.id) + "@emailr.co"
     hdr.setReplyTo(replyToEmail)
-    print hdr
+    print hdr.as_string()
     fromEmail =  "info@emailr.co"
     toEmail = recipient.email.strip()
 
@@ -157,8 +157,6 @@ def receiveEmail(request):
     output = {}
 
     data = request.POST
-    for key in data.keys():
-        print key
     attachments = 0
 
     if 'from' in data.keys():
