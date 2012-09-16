@@ -14,4 +14,4 @@ def save_image(instream):
 	print "After 1]2"
 	k.set_contents_from_string(instream.read())
 	print "Before return  1"
-	return k.generate_url(100000000)
+	return k.generate_url(10000)
