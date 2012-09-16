@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 
 class MailingListGroup(models.Model):
 	owner = models.ForeignKey(User, related_name='mailing_list_owner')
-	members = models.ManyToManyField(User, , related_name='mailing_list_members'))
+	members = models.ManyToManyField(User, related_name='mailing_list_members'))
 
 class EmailPreferences(models.Model):
 	private_posts = models.BooleanField(default=True)
