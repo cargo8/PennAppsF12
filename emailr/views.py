@@ -144,7 +144,8 @@ def receiveEmail(request):
     email = Email(**output)
     email.save()
 
-    for i in range(1,int(attachments)+1):
+    for i in range(1,int(attachments)
+        +1):
         attachment = request.FILES['attachment%d' % i]
         #Use filepicker.io file = attachment.read()
         link = None
@@ -155,10 +156,12 @@ def receiveEmail(request):
     ccs_string = email.text.split('\n')[0]
     if "r#" in ccs_string:
         ccs_string = ccs_string.replace("r#", "")
+    else:
+        ccs_string = None
 
-    print email
     sender = User.objects.get_or_create(email = email.sender)[0]
-    print sender
+    print ccs_string
+    
     contacts = parseContacts(sender , ccs_string)
     print contacts
     post = generatePost(email, sender, contacts)
@@ -201,6 +204,8 @@ def parseContacts(user, ccs_string):
 ##                    break
 ##                c_lname += contact_user[i] + " "
 ##            c_lname = c_lname.strip()
+    if ccs_string is None:
+        return None
     contacts = re.findall('(([^, ]+)(\s*,\s*)?)', ccs_string)
     recipients = []
 
