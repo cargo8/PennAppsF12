@@ -141,7 +141,6 @@ def receiveEmail(request):
     if 'subject' in data.keys():
         output['subject'] = data['subject']
 
-    print output
     email = Email(**output)
     email.save()
 
@@ -157,9 +156,13 @@ def receiveEmail(request):
     if "r#" in ccs_string:
         ccs_string = ccs_string.replace("r#", "")
 
+    print email
     sender = User.objects.get_or_create(email = email.sender)[0]
+    print sender
     contacts = parseContacts(sender , ccs_string)
+    print contacts
     post = generatePost(email, sender, contacts)
+    print post
     
     renderPost(sender, post)
     for contact in contacts:
