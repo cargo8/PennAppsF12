@@ -202,13 +202,13 @@ def receiveEmail(request):
         print contacts
         post = generatePost(email, sender, contacts)
         print post
+        renderPost(sender, post)
+        for contact in contacts:
+            renderPost(contact, post)
     except Exception as e:
             print e
             import traceback
             traceback.format_exc()
-    renderPost(sender, post)
-    for contact in contacts:
-        renderPost(contact, post)
     ##
 
     #Comment
