@@ -18,6 +18,8 @@ class SmtpApiHeader:
         else:
             self.data['to'] += to
  
+    def setReplyTo(self, val):
+        self.data['Reply-To'] = val
     def addSubVal(self, var, val):
         if not self.data.has_key('sub'):
             self.data['sub'] = {}
