@@ -132,7 +132,11 @@ def receiveEmail(request):
             email.attachments.create(link=link)
     else:
             print "F*CK THIS"
-    contacts = None #parseContacts(None, None)
+
+    sender = User.objects.get_or_create(email = email.sender)
+    sender.save()
+
+    contacts = parseContacts(sender, email.cc)
     # post = generatePost(email, contacts)
     # sendPostEmail(post)
     return HttpResponse()
@@ -171,7 +175,7 @@ def parseContacts(user, ccs_string):
             contact = user.instance.contacts.get_or_create(user = contact_user)
             contact.save()
 
-            return recipients
+    return recipients
 
 # generates a post out of the email and its recipients
 def generatePost(email, recipients):
