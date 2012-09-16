@@ -252,7 +252,7 @@ def parseContacts(user, ccs_string):
         # find or create user from parsed info 
         contact_user = user.contacts.get_or_create(email = c_email)[0]
         contact_user.save()
-        
+        print c_email
         # add parsed user to recipient list
         recipients.append(contact_user)
 
