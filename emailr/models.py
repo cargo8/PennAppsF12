@@ -1,9 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-class Group(models.Model):
-	owner = models.ForeignKey(User)
-	members = models.ManyToManyField(User)
+class MailingListGroup(models.Model):
+	owner = models.ForeignKey(User, related_name='mailing_list_owner')
+	members = models.ManyToManyField(User, , related_name='mailing_list_members'))
 
 class EmailPreferences(models.Model):
 	private_posts = models.BooleanField(default=True)
@@ -16,6 +16,7 @@ class EmailPreferences(models.Model):
 	digest_timeframe_days = models.IntegerField(default=1)
 
 class User(models.Model):
+	cred = models.OneToOneField(models.User, related_name = 'user_cred')
 	friends = models.ManyToManyField(User)
 	email = models.EmailField()
 	profile_picture = models.URLField()
@@ -45,7 +46,7 @@ class Post(models.Model):
 	subject = models.CharField(max_length=50)
 	text = models.TextField()
 	content = models.ManyToManyField(Content)
-	likes = models.IntegerField()
+	likes = models.ManyToManyField(User, related_name='post_likes')
 	timestamp = models.DateTimeField(auto_now_add=True)
 	is_public = models.BooleanField(default=False)
 
@@ -54,7 +55,7 @@ class Comment(models.Model):
 	author = models.ForeignKey(User, related_name='comment_author')
 	text = models.TextField()
 	content = models.ManyToManyField(Content)
-	likes = models.IntegerField()
+	likes = models.ManyToManyField(User, related_name='comment_likes')
 	timestamp = models.DateTimeField(auto_now_add=True)
 
 class Digest(models.Model):
