@@ -82,12 +82,14 @@ def testRender(request):
 
 def renderPost(recipient, post):
     #Check if recipent = post.author
+    print "########################################"
     hdr = SmtpApiHeader.SmtpApiHeader()
 
     # Specify that this is an initial contact message
     hdr.setCategory("initial")  
     replyToEmail = "p" + str(post.id) + "@emailr.co"
     hdr.setReplyTo(replyToEmail)
+    print "#####################"
 
     fromEmail =  "info@emailr.co"
     toEmail = recipient.email
@@ -109,6 +111,7 @@ def renderPost(recipient, post):
     pictures = []
     links = []
     files = []
+    print "#"
 
     for attachment in post.content.all():
         if attachment.link_type == attachment.PICTURE:
@@ -120,6 +123,8 @@ def renderPost(recipient, post):
 
     template = None
     inputs = {'post' : post, 'recipent' : recipient, 'is_author' : is_author}
+    print "########################################"
+
     if len(pictures) > 1:
         template = 'two_img_post.html'
         inputs['img1'] = pictures[0]
