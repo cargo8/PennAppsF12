@@ -87,8 +87,7 @@ def renderPost(recipient, post):
     # Specify that this is an initial contact message
     hdr.setCategory("initial")  
     replyToEmail = "p" + str(post.id) + "@emailr.co"
-    hdr.setReplyTo(replyToEmail)
-    print hdr.as_string()
+    
     fromEmail =  "info@emailr.co"
     toEmail = recipient.email.strip()
 
@@ -142,7 +141,7 @@ def renderPost(recipient, post):
 
     html = render_to_string(template, inputs);
 
-    msg = EmailMultiAlternatives(subject, text_content, fromEmail, [toEmail], headers={"X-SMTPAPI": hdr.asJSON()})
+    msg = EmailMultiAlternatives(subject, text_content, fromEmail, [toEmail], headers={"Reply-To" : reply_to, "X-SMTPAPI": hdr.asJSON()})
     msg.attach_alternative(html, "text/html")
     msg.send()
     
