@@ -3,9 +3,9 @@ from django.contrib.auth.models import User as UserCred
 
 class User(models.Model):
     cred = models.OneToOneField(UserCred, related_name = 'user_cred', null=True)
-    friends = models.ManyToManyField('self')
+    friends = models.ManyToManyField('self', null=True)
     email = models.EmailField()
-    profile_picture = models.URLField()
+    profile_picture = models.URLField(null=True)
     first_name = models.CharField(max_length=50, null=True)
     last_name = models.CharField(max_length=50, null=True)
     activated = models.BooleanField(default=False)
