@@ -147,12 +147,12 @@ def renderPost(recipient, post):
     template = None
     inputs = {'post' : post, 'recipent' : recipient, 'is_author' : is_author}
 
-    if recipient in post.likes:
+    if recipient in post.likes.all():
         inputs['liked'] = 1
     else:
         inputs['liked'] = 0
 
-    inputs['likes'] = len(post.likes)
+    inputs['likes'] = len(post.likes.all())
 
     if len(pictures) > 1:
         template = 'two_img_post.html'
@@ -181,8 +181,23 @@ def renderPost(recipient, post):
     
 
 def renderComment(recipient, comment):
-    #Check if recipent = comment.author
-    pass
+    hdr = SmtpApiHeader.SmtpApiHeader()
+    hdr.setCategory("initial")  
+    replyToEmail = "p" + str(comment.post.id) + "c" + str(comment.id) + "@emailr.co"
+    
+    fromEmail =  "info@emailr.co"
+    toEmail = recipient.email.strip()
+
+    is_author = recipient == comment.author
+
+    template = None
+    inputs = {'comment' : comment, 'recipent' : recipient, 'is_author' : is_author}
+
+    html = render_to_string(template, inputs);
+    
+    msg = EmailMultiAlternatives(subject, text_content, fromEmail, [toEmail], headers={"Reply-To" : replyToEmail, "X-SMTPAPI": hdr.asJSON()})
+    msg.attach_alternative(html, "text/html")
+    msg.send()
 
 @require_POST
 @csrf_exempt 
@@ -222,58 +237,70 @@ def receiveEmail(request):
     email = Email(**output)
     email.save()
 
-    for i in range(1,int(attachments)
-        +1):
+    for i in range(1,int(attachments)+1):
         attachment = request.FILES['attachment%d' % i]
         #Use filepicker.io file = attachment.read()
         link = None
         email.attachments.create(link=link)
-
-    try:
-        if "info" in email.to:
-            #This is for a new post
-            ccs_string = email.text.split('\n')[0]
-            if "r#" in ccs_string:
-                ccs_string = ccs_string.replace("r#", "")
+    sender_email = re.findall('(([^, ]+)(\s*,\s*)?)', email.sender)
+    first_last = email.sender.split(" ")
+    first_name = None
+    last_name = None
+    if "@" not in first_last[0]:
+        if "," not in first_last[0]:
+            first_name = first_last[0]
+        else:
+            last_name = first_last[0]
+        if len(first_last) > 2 and "@" not in first_last[1]:
+            if last_name:
+                first_name = first_last[1]
             else:
-                ccs_string = None
-            sender_email = re.findall('(([^, ]+)(\s*,\s*)?)', email.sender)
-            first_last = email.sender.split(" ")
-            first_name = None
-            last_name = None
-            if "@" not in first_last[0]:
-                if "," not in first_last[0]:
-                    first_name = first_last[0]
-                else:
-                    last_name = first_last[0]
-                if len(first_last) > 2 and "@" not in first_last[1]:
-                    if last_name:
-                        first_name = first_last[1]
-                    else:
-                        last_name = first_last[1]
+                last_name = first_last[1]
 
-            sender = User.objects.get_or_create(email = sender_email[0][1])[0]
-            if not sender.first_name:
-                sender.first_name = first_name
-            if not sender.last_name:
-                sender.last_name = last_name
-            sender.save()
-            
-            contacts = parseContacts(sender , ccs_string)
-            post = generatePost(email, sender, contacts)
-                
+    sender = User.objects.get_or_create(email = sender_email[0][1])[0]
+    if not sender.first_name:
+        sender.first_name = first_name
+    if not sender.last_name:
+        sender.last_name = last_name
+
+    sender.save()
+    if "info" in email.to:
+        #This is for a new post
+        ccs_string = email.text.split('\n')[0]
+        if "r#" in ccs_string:
+            ccs_string = ccs_string.replace("r#", "")
+        else:
+            ccs_string = None
+        
+        contacts = parseContacts(sender , ccs_string)
+        post = generatePost(email, sender, contacts)
+        try:
             renderPost(sender, post)
             for contact in contacts:
                 renderPost(contact, post)
-        to_groups = re.match('P(\d+)', email.to)
-        if to_groups:
-            post = Post.objects.get(id = to_groups.group(1))
-            sender = User.objects.get_or_create(email = email.sender)[0]
-            contacts = post.recipients + post.author
-            for contact in contacts:
-                renderComment(contact, post)
-    except Exception as e:
-        print e.message
+            print "HELLO WORLD"
+        except Exception as e:
+            print e.message
+    to_groups = re.match('p(\d+)(c(\d+))?', email.to)
+    if to_groups:
+        post = Post.objects.get(id = to_groups.group(1))
+        if to_groups.group(3):
+            last_comment = Comment.objects.get(id = to_groups.group(3))
+            content = []
+            for att in email.attachments.all():
+                link = att.link
+                ext = link.split(".")[-1].lower()
+                cnt = Content()
+                cnt.link = link
+                if ext in ["jpg", "png", "gif"]:
+                    cnt.link_type = cnt.PICTURE
+                else:
+                    cnt.link_type = cnt.FILE
+                content.add(cnt)
+        comment = Comment.objects.create(author = sender, text = email.text, post = post, content = content)
+        contacts = post.recipients + post.author
+        for contact in contacts:
+            renderComment(contact, comment)
     return HttpResponse()
 
 # @params:
@@ -325,7 +352,6 @@ def generatePost(email, sender, recipients):
     post.recipients = recipients
     post.subject = email.subject
 
-    post.text = email.text
     #lines = email.text.split("\n")
     lines = re.split(r'[\n\r]+', email.text)
     for line in lines:
