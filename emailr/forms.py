@@ -18,7 +18,7 @@ class LoginForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput)
 
 class ProfileForm(forms.Form):
-    email = forms.EmailField()
-#    profile_picture = forms.URLField()
+    email = forms.EmailField(required=False)
+    profile_picture = forms.URLField(required=False)
     first_name = forms.CharField(max_length=50)
     last_name = forms.CharField(max_length=50)
