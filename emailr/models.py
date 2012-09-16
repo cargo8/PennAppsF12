@@ -1,14 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-class Contact(models.Model):
-	owner = models.ForeignKey(User)
-	first_name = models.CharField(max_length=50)
-	last_name = models.CharField(max_length=50)
-
 class Group(models.Model):
 	owner = models.ForeignKey(User)
-	members = models.ManyToManyField(Contact)
+	members = models.ManyToManyField(User)
 
 class EmailPreferences(models.Model):
 	private_posts = models.BooleanField(default=True)
@@ -30,8 +25,19 @@ class User(models.Model):
 	activated = models.BooleanField(default=False)
 
 class Content(models.Model):
+	WEBSITE = 0
+	PICTURE = 1
+	FILE = 2
+
+	LINK_TYPE = (
+    	(WEBSITE, 'Website'),
+    	(PICTURE, 'Picture'),
+    	(FILE, 'File'),
+	)
+
 	link = models.URLField()
-	picture = models.URLField()
+	link_type = models.IntegerField(null=False, choices=LINK_TYPE)
+	
 
 class Post(models.Model):
 	author = models.ForeignKey(User, related_name='post_author')
