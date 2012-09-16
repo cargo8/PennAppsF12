@@ -180,7 +180,7 @@ def receiveEmail(request):
     ccs_string = email.text.split('\n')[0]
     if "r#" in ccs_string:
         ccs_string = ccs_string.replace("r#", "")
-    sender = User.objects.get_or_create(email = email)
+    sender = User.objects.get_or_create(email = email)[0]
     contacts = parseContacts(sender , ccs_string)
     post = generatePost(email, sender, contacts)
     
@@ -228,14 +228,15 @@ def parseContacts(user, ccs_string):
         c_email = contact[1]
            
         # find or create user from parsed info 
-        contact_user = User.objects.get_or_create(email = c_email.lower())[0]
+        contact_user = user.contacts.get_or_create(email = c_email.lower())[0]
         contact_user.save()
         
         # add parsed user to recipient list
         recipients.append(contact_user)
 
         # add new contact user to sender's contacts
-        contact = user.instance.contacts.get_or_create(user = contact_user)
+        contact = user.contacts.get_or_create(user = contact_user)[0]
+
         contact.save()
 
     return recipients
@@ -244,6 +245,7 @@ def parseContacts(user, ccs_string):
 def generatePost(email, sender, recipients):
     post = Post()
     post.author = sender
+    post.save()
     post.recipients = recipients
     post.subject = email.subject
 
@@ -255,17 +257,15 @@ def generatePost(email, sender, recipients):
         post.text += line
 
     # extract images/links from Attachments
-    for att in email.attachments:
+    for att in email.attachments.all():
       link = att.link
       ext = link.split(".")[-1].lower()
       cnt = Content()
+      cnt.link = link
       if ext in ["jpg", "png", "gif"]:
-        cnt.link = None
-        cnt.picture = link
+        cnt.link_type = cnt.PICTURE
       else:
-        cnt.link = link
-        cnt.picture = None
-      post.instance.content.add(cnt)
-
-    post.likes = 0
+        cnt.link_type = cnt.FILE
+      post.content.add(cnt)
+    post.save()
     return post
