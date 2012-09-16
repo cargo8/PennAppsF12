@@ -1,0 +1,13 @@
+{% extends 'email_base.html' %}
+
+{% block preview %}
+{% endblock %}
+
+{% block content %}
+	<div class="comment">
+        <img src="http://plancast.com/uploads/pics/1_pic_square_1271972091.jpg" class="commPic" />
+            <span class="author">{{ comment.author.first_name }} {{ comment.author.last_name }}{% if is_author %} (You){% endif %}</span>
+                                    <span>{{ comment.text }}</span>
+                                    <span class="date">{{ comment.timestamp }}</span>
+                                    </div>
+{% endblock %}

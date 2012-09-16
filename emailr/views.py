@@ -198,9 +198,8 @@ def renderComment(recipient, comment):
 
     is_author = recipient == comment.author
 
-    template = 'text_post.html'
-    #inputs = {'comment' : comment, 'recipent' : recipient, 'is_author' : is_author}
-    inputs = {'post' : comment, 'recipent' : recipient, 'is_author' : is_author}
+    template = 'comment.html'
+    inputs = {'comment' : comment,  'is_author' : is_author}
 
     html = render_to_string(template, inputs);
     
@@ -388,9 +387,13 @@ def generatePost(email, sender, recipients):
 
     #lines = email.text.split("\n")
     post.text = ""
-    lines = re.split(r'[\n\r>]+', email.text)
+    lines = re.split(r'[\n\r]+', email.text)
     for line in lines:
         if not "r#" in line and not ">" in line[:2]:
+            if ">" in line:
+                line = line[:line.find(">")]
+                post.text += line
+                break
             post.text += line
 
     # extract images/links from Attachments
