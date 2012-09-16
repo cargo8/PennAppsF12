@@ -168,7 +168,7 @@ def parseContacts(user, ccs_string):
         else:
             last_name = contact[1]
             first_name = contact[0]
-            if first_name[-1] = ',':
+            if first_name[-1] == ',':
                 last_name = first_name
                 first_name = contact[1]
 
