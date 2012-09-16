@@ -20,6 +20,8 @@ from django.views.decorators.csrf import csrf_exempt
 #######################################################
 
 def index(request):
+    if request.user.is_authenticated:
+        return redirect(home)
     if request.method == 'POST':
         form = TryItForm(request.POST)
         if form.is_valid():
@@ -39,7 +41,7 @@ def signup(request):
             u.save()
             u.auth = new_user
             u.save()
-            return redirect(index)
+            return redirect(register)
     else:
         form = UserCreationForm()
 
@@ -53,7 +55,7 @@ def login(request):
         user = authenticate(username=request.POST['email'], password=request.POST['password'])
         if user is not None:
             auth.login(request, user)
-            return redirect(index)
+            return redirect(home)
         else:
             return redirect(index)
             #render_to_response('login.html', {'form':form})
@@ -63,8 +65,10 @@ def login(request):
     c = RequestContext(request, {'form': form})
     return render_to_response("login.html", c)
 
+#TODO
 def home(request):
-    return render_to_response('index.html')
+    c = RequestContext(request, {'request': request})    
+    return render_to_response('index.html', c)
 
 def testRender(request):
     return render_to_response('one_img_post.html')

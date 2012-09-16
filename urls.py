@@ -8,11 +8,6 @@ from emailr.views import *
 # admin.autodiscover()
 
 urlpatterns = patterns('',
-    # Examples:
-    # url(r'^$', 'pennappsf12.views.home', name='home'),
-    # url(r'^pennappsf12/', include('pennapps12.foo.urls')),
-
-    # url(r'^$', direct_to_template, {'template': 'postcard.html'}),
     url(r'^render/', testRender),
     
     url(r'^home/', home),
