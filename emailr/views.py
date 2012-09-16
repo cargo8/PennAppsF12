@@ -8,7 +8,7 @@ import json
 from django.core.mail import EmailMultiAlternatives
 from emailr.models import *
 from django.views.decorators.http import require_POST
-from emailr.forms import EmailForm
+from emailr.forms import *
 from django.views.decorators.csrf import csrf_exempt  
 
 def index(request):
