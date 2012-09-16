@@ -67,7 +67,7 @@ def renderEmail(request):
 
     text_content = 'Hi -name-!\nHow are you?\n'
 
-    html = render_to_string('email.html', {
+    html = render_to_string('postcard.html', {
 
     });
 
@@ -78,7 +78,7 @@ def renderEmail(request):
     c = RequestContext(request, {
 
         })
-    return render_to_response('email.html', c)
+    return render_to_response('postcard.html', c)
 
 @require_POST
 @csrf_exempt 
