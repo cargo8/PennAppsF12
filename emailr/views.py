@@ -80,8 +80,10 @@ def renderEmail(request):
 @require_POST
 @csrf_exempt 
 def receiveEmail(request):
-    print request.POST.keys()
-    form = EmailForm(request.POST)
+    email_form = {}
+    for key in request.POST.keys():
+        email_form[key] = str(request.POST[key])
+    form = EmailForm(email_form)
     print form.cleaned_data
 
     if form.is_valid():
