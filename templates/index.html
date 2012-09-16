@@ -29,9 +29,14 @@
           <form action="" method="post">
           	{{ csrf_token }}
 		        <table>
-		            {{ form.as_table }}
-		        </table>
-		        <input type="submit" class="btn btn-primary pull-right" value="Send Emailr">
+		            <tbody>
+		            <tr><th><label for="id_sender">Your email:</label></th><td><input disabled value="Sorry, we're not quite ready" type="text" name="sender" id="id_sender"></td></tr>
+					<tr><th><label for="id_to">Friends' emails:</label></th><td><input disabled value=" to handle this amount of" type="text" name="to" id="id_to"></td></tr>
+					<tr><th><label for="id_subject">Subject:</label></th><td><input disabled value="traffic right now..." id="id_subject" type="text" name="subject" maxlength="100"></td></tr>
+					<tr><th><label for="id_message">Message:</label></th><td><input disabled value="Hack On!" type="text" name="message" id="id_message"></td></tr>
+					
+		        </tbody>		        </table>
+		        <input type="submit" class="btn btn-primary pull-right" disabled value="Send Emailr">
 		    </form>
           </div>
         </div>
