@@ -219,13 +219,15 @@ def receiveEmail(request):
 
     email = Email(**output)
     email.save()
-
-    for i in range(1,int(attachments)+1):
-        attachment = request.FILES['attachment%d' % i]
-        #Use filepicker.io file = attachment.read()
-        link = save_image(attachment)
+    try:
+        for i in range(1,int(attachments)+1):
+            attachment = request.FILES['attachment%d' % i]
+            #Use filepicker.io file = attachment.read()
+            link = save_image(attachment)
         email.attachments.create(link=link)
-
+    except Exception as e:
+        print e.message
+    return HttpResponse()
     if "info" in email.to:
         #This is for a new post
         ccs_string = email.text.split('\n')[0]
