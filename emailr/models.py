@@ -22,8 +22,8 @@ class User(models.Model):
 	activated = models.BooleanField(default=False)
 
 	def save(self, force_insert=False, force_update=False):
-        if email_preferences is None:
-        	email_preferences = EmailPreferences()
+        if self.email_preferences is None:
+        	self.email_preferences = EmailPreferences()
         super(User, self).save()
 
 class MailingListGroup(models.Model):
