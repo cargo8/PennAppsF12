@@ -116,7 +116,7 @@ def renderPost(recipient, post):
     hdr.setCategory("initial")  
     replyToEmail = "p" + str(post.id) + "@emailr.co"
     
-    fromEmail =  "info@emailr.co"
+    fromEmail =  "groups@emailr.co"
     toEmail = recipient.email.strip()
 
     # text is your plain-text email
@@ -194,7 +194,7 @@ def renderComment(recipient, comment):
     hdr.setCategory("initial")  
     replyToEmail = "p" + str(comment.post.id) + "c" + str(comment.id) + "@emailr.co"
     
-    fromEmail =  "info@emailr.co"
+    fromEmail =  "groups@emailr.co"
     toEmail = recipient.email.strip()
 
     is_author = recipient == comment.author
