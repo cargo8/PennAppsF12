@@ -58,6 +58,9 @@ def login(request):
 
 def home(request):
     pass
+    
+def talks(request):
+    return render_to_response("talks.html")
 
 def testRender(request):
     return render_to_response('one_img_post.html')
