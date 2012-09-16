@@ -3,7 +3,7 @@ from django.contrib.auth.models import User as UserCred
 
 class User(models.Model):
     cred = models.OneToOneField(UserCred, related_name = 'user_cred', null=True)
-    friends = models.ManyToManyField("User")
+    friends = models.ManyToManyField('self')
     email = models.EmailField()
     profile_picture = models.URLField()
     first_name = models.CharField(max_length=50)
