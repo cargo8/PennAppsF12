@@ -57,8 +57,7 @@ def login(request):
             auth.login(request, user)
             return redirect(home)
         else:
-            return redirect(index)
-            #render_to_response('login.html', {'form':form})
+            return render_to_response('login.html', {'form': LoginForm(request.POST), 'msg': 'Your username and password did not match. Please check your credentials and try again.'})
     else:
         form = LoginForm()
 
