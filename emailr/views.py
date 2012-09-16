@@ -296,7 +296,12 @@ def receiveEmail(request):
                     else:
                         cnt.link_type = cnt.FILE
                     content.add(cnt)
-            comment = Comment.objects.create(author = sender, text = email.text, post = post, content = content)
+            comment = Comment.objects.create(author = sender, text = email.text, post = post)
+            comment.save()
+            if len(content) > 0:
+                comment.content = content
+            comment.save()
+            
             contacts = post.recipients + post.author
             for contact in contacts:
                 renderComment(contact, comment)
