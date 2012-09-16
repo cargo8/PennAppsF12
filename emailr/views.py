@@ -43,7 +43,7 @@ def renderPost(recipient, post):
 
     # Specify that this is an initial contact message
     hdr.setCategory("initial")  
-    replyToEmail = "p" + str(comment.post.id) + "@emailr.co"
+    replyToEmail = "p" + str(post.id) + "@emailr.co"
     hdr.setReplyTo(replyToEmail)
 
     fromEmail =  "info@emailr.co"
