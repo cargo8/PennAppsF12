@@ -80,16 +80,16 @@ def renderEmail(request):
 @require_POST
 @csrf_exempt 
 def receiveEmail(request):
-    output = {}
+    email = Email()
 
     data = request.POST
     attachments = 0
 
     if 'from' in data.keys():
         if type(data['from']) is list:
-            output['sender'] = "; ".join(data['from'])
+            email['sender'] = "; ".join(data['from'])
         else:
-            output['sender'] = data['from']
+            email['sender'] = data['from']
     if 'attachments' in data.keys():
         attachments = data['attachments']
         if type(attachments) is list:
@@ -97,28 +97,22 @@ def receiveEmail(request):
 
     if 'to' in data.keys():
         if type(data['to']) is list:
-            output['to'] = "; ".join(data['to'])
+            email['to'] = "; ".join(data['to'])
         else:
-            output['to'] = data['to']
+            email['to'] = data['to']
     if 'cc' in data.keys():
-        output['cc'] = "; ".join(data['cc'])
+        email['cc'] = "; ".join(data['cc'])
     if 'text' in data.keys():
-        output['text'] = data['text']
+        email['text'] = data['text']
 
     if 'headers' in data.keys():
-        output['headers'] = data['headers']
+        email['headers'] = data['headers']
     if 'html' in data.keys():
-        output['html'] = data['html']
+        email['html'] = data['html']
     if 'subject' in data.keys():
-        output['subject'] = data['subject']
+        email['subject'] = data['subject']
 
-    print output
-
-    for key in output.keys():
-        if type(output[key]) is dict:
-            print key
-            print output[key])
-    email = Email(output)
+    print email
     email.save()
 
     for i in range(1,attachments+1):
